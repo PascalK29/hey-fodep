@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+dist-electron/
+out/
+release/
+*.tsbuildinfo
+
+# Base de données locale (données de l'établissement — jamais versionnées)
+*.sqlite
+*.sqlite3
+*.db
+data/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Éditeurs / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.*
+!.env.example

@@ -1,0 +1,22 @@
+{
+  "name": "heyfodep",
+  "version": "0.1.0",
+  "private": true,
+  "description": "HEYFODEP — Outil de calcul et d'analyse des indicateurs prudentiels UMOA (FODEP / BCEAO). 100% hors-ligne.",
+  "author": "Heymann's Inc.",
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @heyfodep/desktop dev",
+    "build": "pnpm --filter @heyfodep/desktop build",
+    "test": "pnpm --filter @heyfodep/kernel test",
+    "typecheck": "pnpm -r --parallel typecheck",
+    "lint": "pnpm -r --parallel lint"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

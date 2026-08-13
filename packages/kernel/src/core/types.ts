@@ -13,7 +13,7 @@ export type SectionId =
   | "ratio-levier"
   | "reglementation-operations";
 
-export type Unit = "MFCFA" | "PCT";
+export type Unit = "MFCFA" | "PCT" | "UNITE";
 
 /** Un poste est soit saisi par l'utilisateur, soit calculé par une formule. */
 export type DispruKind = "input" | "computed";

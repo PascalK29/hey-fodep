@@ -2,9 +2,23 @@ import { Decimal } from "../core/money";
 import type { DispruDef } from "../core/types";
 import { fondsPropresCodes } from "./codes.fonds-propres";
 import { solvabiliteCodes } from "./codes.solvabilite";
+import { risqueCreditCodes } from "./codes.risque-credit";
+import { risqueOperationnelCodes } from "./codes.risque-operationnel";
+import { risqueMarcheCodes } from "./codes.risque-marche";
+import { grandsRisquesCodes } from "./codes.grands-risques";
 
-/** Tous les postes DISPRU connus du noyau (source unique de vérité). */
-export const ALL_DEFS: DispruDef[] = [...fondsPropresCodes, ...solvabiliteCodes];
+/** 
+ * REGISTRE UNIQUE DE TOUS LES POSTES DISPRU.
+ * Centralise l'intégralité du formulaire FODEP.
+ */
+export const ALL_DEFS: DispruDef[] = [
+  ...fondsPropresCodes,
+  ...solvabiliteCodes,
+  ...risqueCreditCodes,
+  ...risqueOperationnelCodes,
+  ...risqueMarcheCodes,
+  ...grandsRisquesCodes,
+];
 
 /** Index code -> définition. */
 export const REGISTRY: ReadonlyMap<string, DispruDef> = new Map(

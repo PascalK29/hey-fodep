@@ -305,7 +305,7 @@ export const FondsPropresView: React.FC<FondsPropresViewProps> = ({ solva, isSid
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-bold text-blue-800">Ratio fonds propres CET1</span>
                   <span className={`text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-[3px] ${solva.ratios.cet1.toNumber() >= minCet1Req ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
-                    {solva.ratios.cet1.toNumber() >= minCet1Req ? 'Conforme' : 'Infraction'}
+                    {solva.ratios.cet1.toNumber() >= minCet1Req ? 'Conforme' : 'Déficit'}
                   </span>
                 </div>
                 <p className="text-[10px] font-semibold text-slate-600 mb-4 h-6">Fonds propres de qualité supérieure (capital social, réserves).</p>
@@ -326,7 +326,7 @@ export const FondsPropresView: React.FC<FondsPropresViewProps> = ({ solva, isSid
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-bold text-blue-800">Ratio fonds propres Tier 1</span>
                   <span className={`text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-[3px] ${solva.ratios.t1.toNumber() >= minT1Req ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
-                    {solva.ratios.t1.toNumber() >= minT1Req ? 'Conforme' : 'Infraction'}
+                    {solva.ratios.t1.toNumber() >= minT1Req ? 'Conforme' : 'Déficit'}
                   </span>
                 </div>
                 <p className="text-[10px] font-semibold text-slate-600 mb-4 h-6">Fonds propres de base (CET1 + capital additionnel AT1).</p>
@@ -347,7 +347,7 @@ export const FondsPropresView: React.FC<FondsPropresViewProps> = ({ solva, isSid
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-bold text-blue-800">Ratio solvabilité total</span>
                   <span className={`text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-[3px] ${solva.ratios.total.toNumber() >= minTotalReq ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
-                    {solva.ratios.total.toNumber() >= minTotalReq ? 'Conforme' : 'Infraction'}
+                    {solva.ratios.total.toNumber() >= minTotalReq ? 'Conforme' : 'Déficit'}
                   </span>
                 </div>
                 <p className="text-[10px] font-semibold text-slate-600 mb-4 h-6">Ratio de couverture global (Tier 1 + Tier 2).</p>

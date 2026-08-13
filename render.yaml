@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: heyfodep-ui
+    env: static
+    buildCommand: npm install -g pnpm && pnpm install && pnpm --filter @heyfodep/ui build
+    staticPublishPath: packages/ui/dist
+    envVars:
+      - key: NODE_VERSION
+        value: 20

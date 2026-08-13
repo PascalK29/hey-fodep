@@ -290,7 +290,79 @@ export const FondsPropresView: React.FC<FondsPropresViewProps> = ({ solva, isSid
             </div>
           </div>
 
-          {/* 2. Ratios Réglementaires & Solvabilité */}
+          {/* 2. Répartition & Qualité des Fonds Propres (Redesigned) */}
+          <div className="flex flex-col md:flex-row items-center gap-8 bg-white rounded-[4px] border border-slate-200/80 shadow-sm p-6">
+            {/* Left: SVG Donut Chart */}
+            <div className="relative w-36 h-36 shrink-0">
+              <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#f1f5f9" strokeWidth="12" />
+                {/* CET1 */}
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#1a2542" strokeWidth="12" 
+                  strokeDasharray={`${share(cet1) * 2.51327} 251.327`} strokeDashoffset="0" 
+                  className="transition-all duration-700 ease-out" />
+                {/* AT1 */}
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#6366f1" strokeWidth="12" 
+                  strokeDasharray={`${share(at1) * 2.51327} 251.327`} strokeDashoffset={`-${share(cet1) * 2.51327}`} 
+                  className="transition-all duration-700 ease-out" />
+                {/* T2 */}
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#93c5fd" strokeWidth="12" 
+                  strokeDasharray={`${share(t2) * 2.51327} 251.327`} strokeDashoffset={`-${(share(cet1) + share(at1)) * 2.51327}`} 
+                  className="transition-all duration-700 ease-out" />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center pt-1">
+                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Total</span>
+                <span className="text-sm font-black text-[#1a2542]">{formatMoney(cet1 + at1 + t2)}</span>
+              </div>
+            </div>
+
+            {/* Right: Legend & Details */}
+            <div className="flex-1 w-full">
+              <div className="mb-5">
+                <h3 className="text-xs font-bold text-blue-800 uppercase tracking-wider">Qualité & Répartition du Capital</h3>
+                <p className="text-[10px] text-slate-600 mt-0.5 font-semibold">Part relative de chaque catégorie de fonds propres dans l'enveloppe globale</p>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="flex flex-col p-3.5 rounded-[4px] bg-slate-50 border border-slate-100/80">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#1a2542]"></span>
+                    <span className="text-[10.5px] font-bold text-slate-700">Fonds propres CET1</span>
+                  </div>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-lg font-black text-[#1a2542]">{formatMoney(cet1)}</span>
+                    <span className="text-[9px] font-bold text-slate-500 uppercase">M FCFA</span>
+                  </div>
+                  <span className="text-[10px] font-semibold text-slate-500 mt-1">{share(cet1).toFixed(1)}% de la base</span>
+                </div>
+
+                <div className="flex flex-col p-3.5 rounded-[4px] bg-slate-50 border border-slate-100/80">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#6366f1]"></span>
+                    <span className="text-[10.5px] font-bold text-slate-700">Fonds propres AT1</span>
+                  </div>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-lg font-black text-[#1a2542]">{formatMoney(at1)}</span>
+                    <span className="text-[9px] font-bold text-slate-500 uppercase">M FCFA</span>
+                  </div>
+                  <span className="text-[10px] font-semibold text-slate-500 mt-1">{share(at1).toFixed(1)}% de la base</span>
+                </div>
+
+                <div className="flex flex-col p-3.5 rounded-[4px] bg-slate-50 border border-slate-100/80">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#93c5fd]"></span>
+                    <span className="text-[10.5px] font-bold text-slate-700">Fonds propres T2</span>
+                  </div>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-lg font-black text-[#1a2542]">{formatMoney(t2)}</span>
+                    <span className="text-[9px] font-bold text-slate-500 uppercase">M FCFA</span>
+                  </div>
+                  <span className="text-[10px] font-semibold text-slate-500 mt-1">{share(t2).toFixed(1)}% de la base</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. Ratios Réglementaires & Solvabilité */}
           <div className="bg-white rounded-[4px] border border-slate-200/80 shadow-sm p-5">
             <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
               <div>
@@ -361,78 +433,6 @@ export const FondsPropresView: React.FC<FondsPropresViewProps> = ({ solva, isSid
                 <span className={`text-[10px] font-bold mt-1 ${totalSurplus >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                   Coussin : {totalSurplus >= 0 ? '+' : ''}{formatMoney(totalSurplus)} M FCFA
                 </span>
-              </div>
-            </div>
-          </div>
-
-          {/* 3. Répartition & Qualité des Fonds Propres (Redesigned) */}
-          <div className="flex flex-col md:flex-row items-center gap-8 bg-white rounded-[4px] border border-slate-200/80 shadow-sm p-6">
-            {/* Left: SVG Donut Chart */}
-            <div className="relative w-36 h-36 shrink-0">
-              <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
-                <circle cx="50" cy="50" r="40" fill="none" stroke="#f1f5f9" strokeWidth="12" />
-                {/* CET1 */}
-                <circle cx="50" cy="50" r="40" fill="none" stroke="#1a2542" strokeWidth="12" 
-                  strokeDasharray={`${share(cet1) * 2.51327} 251.327`} strokeDashoffset="0" 
-                  className="transition-all duration-700 ease-out" />
-                {/* AT1 */}
-                <circle cx="50" cy="50" r="40" fill="none" stroke="#6366f1" strokeWidth="12" 
-                  strokeDasharray={`${share(at1) * 2.51327} 251.327`} strokeDashoffset={`-${share(cet1) * 2.51327}`} 
-                  className="transition-all duration-700 ease-out" />
-                {/* T2 */}
-                <circle cx="50" cy="50" r="40" fill="none" stroke="#93c5fd" strokeWidth="12" 
-                  strokeDasharray={`${share(t2) * 2.51327} 251.327`} strokeDashoffset={`-${(share(cet1) + share(at1)) * 2.51327}`} 
-                  className="transition-all duration-700 ease-out" />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center pt-1">
-                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Total</span>
-                <span className="text-sm font-black text-[#1a2542]">{formatMoney(cet1 + at1 + t2)}</span>
-              </div>
-            </div>
-
-            {/* Right: Legend & Details */}
-            <div className="flex-1 w-full">
-              <div className="mb-5">
-                <h3 className="text-xs font-bold text-blue-800 uppercase tracking-wider">Qualité & Répartition du Capital</h3>
-                <p className="text-[10px] text-slate-600 mt-0.5 font-semibold">Part relative de chaque catégorie de fonds propres dans l'enveloppe globale</p>
-              </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="flex flex-col p-3.5 rounded-[4px] bg-slate-50 border border-slate-100/80">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#1a2542]"></span>
-                    <span className="text-[10.5px] font-bold text-slate-700">Fonds propres CET1</span>
-                  </div>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-lg font-black text-[#1a2542]">{formatMoney(cet1)}</span>
-                    <span className="text-[9px] font-bold text-slate-500 uppercase">M FCFA</span>
-                  </div>
-                  <span className="text-[10px] font-semibold text-slate-500 mt-1">{share(cet1).toFixed(1)}% de la base</span>
-                </div>
-
-                <div className="flex flex-col p-3.5 rounded-[4px] bg-slate-50 border border-slate-100/80">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#6366f1]"></span>
-                    <span className="text-[10.5px] font-bold text-slate-700">Fonds propres AT1</span>
-                  </div>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-lg font-black text-[#1a2542]">{formatMoney(at1)}</span>
-                    <span className="text-[9px] font-bold text-slate-500 uppercase">M FCFA</span>
-                  </div>
-                  <span className="text-[10px] font-semibold text-slate-500 mt-1">{share(at1).toFixed(1)}% de la base</span>
-                </div>
-
-                <div className="flex flex-col p-3.5 rounded-[4px] bg-slate-50 border border-slate-100/80">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#93c5fd]"></span>
-                    <span className="text-[10.5px] font-bold text-slate-700">Fonds propres T2</span>
-                  </div>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-lg font-black text-[#1a2542]">{formatMoney(t2)}</span>
-                    <span className="text-[9px] font-bold text-slate-500 uppercase">M FCFA</span>
-                  </div>
-                  <span className="text-[10px] font-semibold text-slate-500 mt-1">{share(t2).toFixed(1)}% de la base</span>
-                </div>
               </div>
             </div>
           </div>

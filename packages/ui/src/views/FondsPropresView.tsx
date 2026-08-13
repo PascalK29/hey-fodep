@@ -217,11 +217,11 @@ export const FondsPropresView: React.FC<FondsPropresViewProps> = ({ solva, isSid
 
   const mainTabOptions = [
     { id: 'synthese', label: 'Synthèse' },
-    { id: 'cet1', label: 'Fonds Propres Durs' },
-    { id: 'at1', label: 'Fonds Propres Additionnels' },
-    { id: 't1', label: 'Fonds Propres de Base' },
-    { id: 't2', label: 'Fonds Propres Complémentaires' },
-    { id: 'effectifs', label: 'Fonds Propres Effectifs' },
+    { id: 'cet1', label: 'Fonds propres durs' },
+    { id: 'at1', label: 'Fonds propres additionnels' },
+    { id: 't1', label: 'Fonds propres de base' },
+    { id: 't2', label: 'Fonds propres complémentaires' },
+    { id: 'effectifs', label: 'Fonds propres effectifs' },
   ];
 
   return (
@@ -303,7 +303,7 @@ export const FondsPropresView: React.FC<FondsPropresViewProps> = ({ solva, isSid
               {/* Ratio CET1 */}
               <div className="flex flex-col border border-[#1a2542]/30 rounded-[4px] p-4 bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-blue-800">Ratio Fonds Propres CET1</span>
+                  <span className="text-xs font-bold text-blue-800">Ratio fonds propres CET1</span>
                   <span className={`text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-[3px] ${solva.ratios.cet1.toNumber() >= minCet1Req ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
                     {solva.ratios.cet1.toNumber() >= minCet1Req ? 'Conforme' : 'Infraction'}
                   </span>
@@ -324,7 +324,7 @@ export const FondsPropresView: React.FC<FondsPropresViewProps> = ({ solva, isSid
               {/* Ratio Tier 1 */}
               <div className="flex flex-col border border-[#1a2542]/30 rounded-[4px] p-4 bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-blue-800">Ratio Fonds Propres Tier 1</span>
+                  <span className="text-xs font-bold text-blue-800">Ratio fonds propres Tier 1</span>
                   <span className={`text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-[3px] ${solva.ratios.t1.toNumber() >= minT1Req ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
                     {solva.ratios.t1.toNumber() >= minT1Req ? 'Conforme' : 'Infraction'}
                   </span>
@@ -345,7 +345,7 @@ export const FondsPropresView: React.FC<FondsPropresViewProps> = ({ solva, isSid
               {/* Ratio de Solvabilité Total */}
               <div className="flex flex-col border border-[#1a2542]/30 rounded-[4px] p-4 bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-blue-800">Ratio Solvabilité Total</span>
+                  <span className="text-xs font-bold text-blue-800">Ratio solvabilité total</span>
                   <span className={`text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-[3px] ${solva.ratios.total.toNumber() >= minTotalReq ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
                     {solva.ratios.total.toNumber() >= minTotalReq ? 'Conforme' : 'Infraction'}
                   </span>

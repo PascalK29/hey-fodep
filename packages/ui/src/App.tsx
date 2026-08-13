@@ -32,11 +32,11 @@ type TabId = 'dashboard' | 'fonds-propres' | 'credit' | 'marche' | 'operationnel
 
 const SECTION_LABELS: Record<TabId, string> = {
   dashboard: 'Tableau de bord',
-  'fonds-propres': 'Fonds Propres & Solvabilité',
-  credit: 'Risque de Crédit',
-  marche: 'Risque de Marché',
-  operationnel: 'Risque Opérationnel',
-  'grands-risques': 'Grands Risques',
+  'fonds-propres': 'Fonds propres & solvabilité',
+  credit: 'Risque de crédit',
+  marche: 'Risque de marché',
+  operationnel: 'Risque opérationnel',
+  'grands-risques': 'Grands risques',
   import: 'Importation de données',
   export: 'Exportation du FODEP',
 };
@@ -202,11 +202,11 @@ export default function App() {
             </NavSection>
 
             <NavSection title="États FODEP" isCollapsed={isCollapsed}>
-              <NavItem icon={ShieldCheck} label="Fonds Propres & Solvabilité" active={activeTab === 'fonds-propres'} onClick={() => setActiveTab('fonds-propres')} isCollapsed={isCollapsed} />
-              <NavItem icon={Briefcase} label="Risque de Crédit" active={activeTab === 'credit'} onClick={() => setActiveTab('credit')} isCollapsed={isCollapsed} />
-              <NavItem icon={TrendingUp} label="Risque de Marché" active={activeTab === 'marche'} onClick={() => setActiveTab('marche')} isCollapsed={isCollapsed} />
-              <NavItem icon={AlertTriangle} label="Risque Opérationnel" active={activeTab === 'operationnel'} onClick={() => setActiveTab('operationnel')} isCollapsed={isCollapsed} />
-              <NavItem icon={FileSpreadsheet} label="Grands Risques" active={activeTab === 'grands-risques'} onClick={() => setActiveTab('grands-risques')} isCollapsed={isCollapsed} />
+              <NavItem icon={ShieldCheck} label="Fonds propres & solvabilité" active={activeTab === 'fonds-propres'} onClick={() => setActiveTab('fonds-propres')} isCollapsed={isCollapsed} />
+              <NavItem icon={Briefcase} label="Risque de crédit" active={activeTab === 'credit'} onClick={() => setActiveTab('credit')} isCollapsed={isCollapsed} />
+              <NavItem icon={TrendingUp} label="Risque de marché" active={activeTab === 'marche'} onClick={() => setActiveTab('marche')} isCollapsed={isCollapsed} />
+              <NavItem icon={AlertTriangle} label="Risque opérationnel" active={activeTab === 'operationnel'} onClick={() => setActiveTab('operationnel')} isCollapsed={isCollapsed} />
+              <NavItem icon={FileSpreadsheet} label="Grands risques" active={activeTab === 'grands-risques'} onClick={() => setActiveTab('grands-risques')} isCollapsed={isCollapsed} />
             </NavSection>
 
             <NavSection title="Données & Échanges" isCollapsed={isCollapsed}>

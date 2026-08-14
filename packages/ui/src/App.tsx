@@ -15,7 +15,8 @@ import {
   Globe,
   Type,
   Upload,
-  Download
+  Download,
+  Calendar
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { ResponsiveContainer, Cell, PieChart, Pie, Tooltip } from 'recharts';
@@ -121,44 +122,65 @@ export default function App() {
     <div className="flex flex-col h-screen bg-[#F4F7FA] font-sans text-slate-800 overflow-hidden" style={{ fontFamily: font }}>
       
       {/* Top Navbar */}
-      <header className="h-14 bg-white border-b border-slate-200 flex items-center justify-between shrink-0 z-20">
-        <div className="flex items-center gap-3 pl-3">
-          {/* Logo encadré */}
-          <div className="w-11 h-11 rounded-[5px] bg-[#111827] flex items-center justify-center shadow-[0_4px_12px_rgba(26,37,66,0.25)]">
-            <img src="/logo3.png" alt="HEY-FODEP" className="h-7 w-7 object-contain" />
+      <header className="h-16 bg-white/95 backdrop-blur-md border-b border-slate-200/80 flex items-center justify-between px-4 shrink-0 z-20 shadow-[0_1px_3px_rgba(15,23,42,0.04)]">
+        <div className="flex items-center gap-3.5">
+          {/* Logo encadré modernisé */}
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1E293B] via-[#0F172A] to-[#020617] flex items-center justify-center shadow-md ring-1 ring-slate-900/10 transition-transform hover:scale-105 duration-200">
+            <img src="/logo3.png" alt="HEY-FODEP" className="h-6 w-6 object-contain filter drop-shadow" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[#1a2542] font-extrabold text-lg leading-tight tracking-tight">FODEP</span>
-            <span className="text-indigo-600 text-[10px] font-semibold leading-tight">Conformité prudentielle BCEAO</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[#0F172A] font-black text-xl leading-none tracking-tight">FODEP</span>
+              <span className="text-[9px] font-extrabold tracking-wider text-indigo-700 uppercase bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100/90">
+                BCEAO UMOA
+              </span>
+            </div>
+            <span className="text-slate-500 text-[11px] font-semibold leading-tight mt-0.5">
+              Pilotage & Conformité Prudentielle
+            </span>
           </div>
         </div>
 
-        {/* Paramètres */}
-        <div className="relative h-full flex items-center pr-5">
-          {/* Pastille date d'arrêté (date visible, libellé au survol) */}
-          <div className="group relative mr-3 flex items-center">
-            <span className="inline-flex h-7 items-center justify-center rounded-[5px] bg-indigo-50 px-2.5 text-[11px] font-semibold text-blue-900">
-              30/06/2026
-            </span>
-            <span className="pointer-events-none absolute right-0 top-full z-40 mt-2 whitespace-nowrap rounded bg-[#1a2542] px-2 py-1 text-[11px] font-medium text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100">
-              Date d'arrêté
+        {/* Center Pill Badge */}
+        <div className="hidden lg:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-slate-100/80 border border-slate-200/70 text-xs font-semibold text-slate-700 shadow-2xs">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+          <span className="text-[11.5px] font-bold text-[#0F172A]">Dispositif Bâle II / III</span>
+          <span className="text-slate-400">•</span>
+          <span className="text-[11px] font-medium text-slate-600">Normes Prudentielles Validées</span>
+        </div>
+
+        {/* Paramètres & Date */}
+        <div className="relative h-full flex items-center gap-2">
+          {/* Pastille Date d'Arrêté */}
+          <div className="group relative flex items-center">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-50/90 border border-indigo-100 text-indigo-900 text-xs font-bold shadow-2xs hover:bg-indigo-100 transition-colors cursor-pointer">
+              <Calendar className="w-3.5 h-3.5 text-indigo-600" />
+              <span>30/06/2026</span>
+            </div>
+            <span className="pointer-events-none absolute right-0 top-full z-40 mt-2 whitespace-nowrap rounded-md bg-[#0F172A] px-2.5 py-1 text-[11px] font-semibold text-white opacity-0 shadow-xl transition-all duration-150 group-hover:opacity-100">
+              Date d'arrêté des comptes
             </span>
           </div>
 
           <button 
             onClick={() => setSettingsOpen(!settingsOpen)} 
-            className={`w-9 h-7 flex items-center justify-center rounded-[5px] transition-colors ${
-              settingsOpen ? 'bg-[#1a2542] text-white shadow-[0_2px_8px_rgba(26,37,66,0.18)]' : 'bg-slate-100 text-[#1a2542] hover:bg-slate-200/70'
+            className={`w-9 h-9 flex items-center justify-center rounded-lg border transition-all duration-200 ${
+              settingsOpen 
+                ? 'bg-[#0F172A] text-white border-[#0F172A] shadow-md' 
+                : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-indigo-600 hover:border-slate-300 shadow-2xs'
             }`}
-            title="Paramètres"
+            title="Paramètres de l'application"
           >
-            <MoreHorizontal className="w-5 h-5" />
+            <MoreHorizontal className="w-4 h-4" />
           </button>
 
           {settingsOpen && (
             <>
               <div className="fixed inset-0 z-30" onClick={() => setSettingsOpen(false)} />
-              <div className="absolute right-5 top-full mt-2 w-64 bg-white rounded-[5px] shadow-[0_12px_32px_rgba(26,37,66,0.18)] p-1.5 z-40 fade-in">
+              <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-[0_12px_36px_rgba(15,23,42,0.16)] border border-slate-200/80 p-1.5 z-40 fade-in">
                 <SettingItem icon={Palette} title="Thème" open={openSetting === 'theme'} onToggle={() => setOpenSetting(openSetting === 'theme' ? null : 'theme')}>
                   <Choice label="Clair" active={theme === 'clair'} onClick={() => setTheme('clair')} />
                   <Choice label="Sombre" active={theme === 'sombre'} onClick={() => setTheme('sombre')} />
@@ -236,10 +258,26 @@ export default function App() {
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-[1400px] mx-auto">
             {/* Section header (fixé au défilement) */}
-            <div className="sticky top-0 z-10 bg-[#F4F7FA]/95 backdrop-blur-sm border-b border-slate-200 px-8 py-2.5">
-              <h1 className="text-lg font-bold text-blue-900 tracking-tight leading-none">
-                {SECTION_LABELS[activeTab]}
-              </h1>
+            <div className="sticky top-0 z-10 bg-[#F4F7FA]/90 backdrop-blur-md border-b border-slate-200/80 px-8 py-3.5 flex items-center justify-between shadow-[0_2px_8px_rgba(15,23,42,0.02)]">
+              <div className="flex items-center gap-3">
+                <div className="w-1.5 h-6 rounded-full bg-gradient-to-b from-indigo-600 to-blue-800" />
+                <div>
+                  <div className="text-[9.5px] font-extrabold uppercase tracking-widest text-indigo-600/90 leading-tight">
+                    Dispositif Prudentiel • UMOA
+                  </div>
+                  <h1 className="text-xl font-black text-[#0F172A] tracking-tight leading-tight">
+                    {SECTION_LABELS[activeTab]}
+                  </h1>
+                </div>
+              </div>
+              <div className="hidden sm:flex items-center gap-2">
+                <span className="text-[10.5px] font-bold text-slate-600 bg-white px-3 py-1 rounded-lg border border-slate-200/80 shadow-2xs">
+                  Arrêté 30/06/2026
+                </span>
+                <span className="text-[10.5px] font-extrabold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-200/80 uppercase tracking-wider">
+                  Données Valides
+                </span>
+              </div>
             </div>
 
             <div key={activeTab} className="p-8 space-y-6 fade-in">

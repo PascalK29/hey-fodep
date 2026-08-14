@@ -271,8 +271,8 @@ export const RisqueCreditView: React.FC<RisqueCreditViewProps> = ({ solva, isSid
       {/* --- ONGLET RÉPARTITION PAR CATÉGORIE --- */}
       {activeTab === 'repartition' && (
         <div className="fade-in">
-          <div className="bg-white rounded-[4px] border border-slate-200 shadow-sm p-6">
-            <div className="flex items-center justify-between mb-6 border-b border-slate-100 pb-3">
+          <div className="bg-white rounded-[4px] border border-slate-200 shadow-sm p-6 flex flex-col max-h-[480px]">
+            <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-3 shrink-0">
               <div>
                 <h3 className="text-xs font-bold text-blue-800 uppercase tracking-wider">Répartition des Expositions Nettes par Catégorie</h3>
                 <p className="text-[10px] text-[#1a2542] mt-0.5 font-semibold">Classement des portefeuilles selon la réglementation BCEAO</p>
@@ -282,7 +282,7 @@ export const RisqueCreditView: React.FC<RisqueCreditViewProps> = ({ solva, isSid
               </span>
             </div>
 
-            <div className="flex flex-col relative">
+            <div className="flex-1 overflow-y-auto pr-2 relative custom-scrollbar">
               {/* Background grid lines */}
               <div className="absolute left-[35%] right-[20%] top-0 bottom-0 flex justify-between pointer-events-none z-0 px-3">
                  <div className="w-px h-full bg-slate-100 border-r border-slate-200 border-dashed" />
@@ -351,8 +351,8 @@ export const RisqueCreditView: React.FC<RisqueCreditViewProps> = ({ solva, isSid
 
       {/* --- ONGLET BILAN --- */}
       {activeTab === 'bilan' && (
-        <div className="bg-white rounded-[4px] border border-slate-200 shadow-sm overflow-hidden fade-in">
-          <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-[#1a2542] text-white">
+        <div className="bg-white rounded-[4px] border border-slate-200 shadow-sm overflow-hidden fade-in flex flex-col max-h-[480px]">
+          <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-[#1a2542] text-white shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-1 h-7 rounded-full bg-indigo-400" />
               <div>
@@ -366,10 +366,10 @@ export const RisqueCreditView: React.FC<RisqueCreditViewProps> = ({ solva, isSid
             </div>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto overflow-y-auto flex-1 custom-scrollbar">
             <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="text-[9.5px] font-bold uppercase tracking-wider text-blue-900 border-b border-slate-200 bg-slate-50/70">
+              <thead className="sticky top-0 z-10 bg-slate-50 shadow-sm">
+                <tr className="text-[9.5px] font-bold uppercase tracking-wider text-blue-900 border-b border-slate-200">
                   <th className="py-3 px-4 w-10 text-center">#</th>
                   <th className="py-3 px-4 min-w-[260px]">Catégorie d'exposition</th>
                   <th className="py-3 px-4 text-right">Expo brute</th>
@@ -404,8 +404,8 @@ export const RisqueCreditView: React.FC<RisqueCreditViewProps> = ({ solva, isSid
                   );
                 })}
               </tbody>
-              <tfoot>
-                <tr className="bg-indigo-50/70 border-t border-indigo-100">
+              <tfoot className="sticky bottom-0 z-10 bg-indigo-50/95 backdrop-blur-sm shadow-sm">
+                <tr className="border-t border-indigo-100">
                   <td colSpan={2} className="py-3 px-4 text-[10.5px] font-black text-blue-900 uppercase tracking-wide">Sous-total Bilan</td>
                   <td className="py-3 px-4 text-right text-[12px] font-black text-[#1a2542] tabular-nums">{formatMoney(totalBilanBrut)}</td>
                   <td className="py-3 px-4 text-right text-[12px] font-black text-amber-700 tabular-nums">
@@ -423,8 +423,8 @@ export const RisqueCreditView: React.FC<RisqueCreditViewProps> = ({ solva, isSid
 
       {/* --- ONGLET HORS BILAN --- */}
       {activeTab === 'hors-bilan' && (
-        <div className="bg-white rounded-[4px] border border-slate-200 shadow-sm overflow-hidden fade-in">
-          <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-[#1a2542] text-white">
+        <div className="bg-white rounded-[4px] border border-slate-200 shadow-sm overflow-hidden fade-in flex flex-col max-h-[480px]">
+          <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-[#1a2542] text-white shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-1 h-7 rounded-full bg-blue-400" />
               <div>
@@ -438,10 +438,10 @@ export const RisqueCreditView: React.FC<RisqueCreditViewProps> = ({ solva, isSid
             </div>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto overflow-y-auto flex-1 custom-scrollbar">
             <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="text-[9.5px] font-bold uppercase tracking-wider text-blue-900 border-b border-slate-200 bg-slate-50/70">
+              <thead className="sticky top-0 z-10 bg-slate-50 shadow-sm">
+                <tr className="text-[9.5px] font-bold uppercase tracking-wider text-blue-900 border-b border-slate-200">
                   <th className="py-3 px-4 w-10 text-center">#</th>
                   <th className="py-3 px-4 min-w-[260px]">Catégorie d'exposition</th>
                   <th className="py-3 px-4 text-right">Avant FCEC</th>
@@ -476,8 +476,8 @@ export const RisqueCreditView: React.FC<RisqueCreditViewProps> = ({ solva, isSid
                   );
                 })}
               </tbody>
-              <tfoot>
-                <tr className="bg-indigo-50/70 border-t border-indigo-100">
+              <tfoot className="sticky bottom-0 z-10 bg-indigo-50/95 backdrop-blur-sm shadow-sm">
+                <tr className="border-t border-indigo-100">
                   <td colSpan={2} className="py-3 px-4 text-[10.5px] font-black text-blue-900 uppercase tracking-wide">Sous-total Hors Bilan</td>
                   <td className="py-3 px-4 text-right text-[12px] font-black text-[#1a2542] tabular-nums">{formatMoney(totalHorsBilanBrut)}</td>
                   <td className="py-3 px-4 text-right text-[12px] font-black text-blue-700 tabular-nums">
@@ -495,8 +495,8 @@ export const RisqueCreditView: React.FC<RisqueCreditViewProps> = ({ solva, isSid
 
       {/* --- ONGLET ATTÉNUATION & APR --- */}
       {activeTab === 'attenuation' && (
-        <div className="bg-white rounded-[4px] border border-slate-200 shadow-sm overflow-hidden fade-in">
-          <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-[#1a2542] text-white">
+        <div className="bg-white rounded-[4px] border border-slate-200 shadow-sm overflow-hidden fade-in flex flex-col max-h-[480px]">
+          <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-[#1a2542] text-white shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-1 h-7 rounded-full bg-emerald-400" />
               <div>
@@ -510,10 +510,10 @@ export const RisqueCreditView: React.FC<RisqueCreditViewProps> = ({ solva, isSid
             </div>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto overflow-y-auto flex-1 custom-scrollbar">
             <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="text-[9.5px] font-bold uppercase tracking-wider text-blue-900 border-b border-slate-200 bg-slate-50/70">
+              <thead className="sticky top-0 z-10 bg-slate-50 shadow-sm">
+                <tr className="text-[9.5px] font-bold uppercase tracking-wider text-blue-900 border-b border-slate-200">
                   <th className="py-3 px-4 w-10 text-center">#</th>
                   <th className="py-3 px-4 min-w-[220px]">Catégorie d'exposition</th>
                   <th className="py-3 px-4 text-right">Nette (Avant ARC)</th>
@@ -552,8 +552,8 @@ export const RisqueCreditView: React.FC<RisqueCreditViewProps> = ({ solva, isSid
                   );
                 })}
               </tbody>
-              <tfoot>
-                <tr className="bg-indigo-50/70 border-t border-indigo-100">
+              <tfoot className="sticky bottom-0 z-10 bg-indigo-50/95 backdrop-blur-sm shadow-sm">
+                <tr className="border-t border-indigo-100">
                   <td colSpan={2} className="py-3 px-4 text-[10.5px] font-black text-blue-900 uppercase tracking-wide">Sous-total Risque de Crédit</td>
                   <td className="py-3 px-4 text-right text-[12px] font-black text-[#1a2542] tabular-nums">{formatMoney(CATEGORIES_EXPOSITIONS.reduce((acc, cat) => acc + getVal(`EP12_20_${cat.id}_AVANT_ARC`), 0))}</td>
                   <td className="py-3 px-4 text-right text-[12px] font-black text-amber-700 tabular-nums">{formatMoney(CATEGORIES_EXPOSITIONS.reduce((acc, cat) => acc + getVal(`EP12_20_${cat.id}_AJUST_ARC`), 0))}</td>

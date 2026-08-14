@@ -263,7 +263,7 @@ export default function App() {
                   <div className="bg-white rounded-[3px] border border-slate-200/60 shadow-sm p-3.5 flex flex-col justify-between transition-shadow hover:shadow-md">
                     <h3 className="text-[10px] font-bold uppercase tracking-wider text-blue-900">Total APR</h3>
                     <div className="text-lg font-bold text-[#1a2542] tabular-nums mt-1">{Number(solva.apr).toLocaleString('fr-FR')}</div>
-                    <div className="text-[9px] font-medium text-slate-400 mt-1">Actifs Pondérés des Risques</div>
+                    <div className="text-[9px] font-medium text-slate-400 mt-1">Actifs Pondérés par le Risque</div>
                   </div>
 
                   <div className={`rounded-[3px] border p-3.5 flex flex-col justify-center ${isConforme ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100'}`}>

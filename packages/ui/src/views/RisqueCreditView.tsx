@@ -193,7 +193,7 @@ export const RisqueCreditView: React.FC<RisqueCreditViewProps> = ({ solva, isSid
                   Total APR Crédit
                 </span>
                 <span className="shrink-0 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider bg-indigo-500/20 text-indigo-300">
-                  Actifs Pondérés
+                  Actifs Pondérés par le Risque
                 </span>
               </div>
               <div className="relative z-10 flex items-baseline gap-1 mb-2">

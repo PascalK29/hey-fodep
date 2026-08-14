@@ -611,7 +611,7 @@ export const FondsPropresView: React.FC<FondsPropresViewProps> = ({ solva, isSid
               </div>
               <div className="relative z-10 mt-auto border-t border-slate-100 pt-1.5">
                 <span className="text-[9px] font-medium text-slate-500">
-                  Actifs pondérés par les risques
+                  Actifs Pondérés par le Risque
                 </span>
               </div>
             </div>

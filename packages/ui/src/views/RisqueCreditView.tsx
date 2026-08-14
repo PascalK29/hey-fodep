@@ -271,18 +271,29 @@ export const RisqueCreditView: React.FC<RisqueCreditViewProps> = ({ solva, isSid
       {/* --- ONGLET RÉPARTITION PAR CATÉGORIE --- */}
       {activeTab === 'repartition' && (
         <div className="fade-in">
-          <div className="bg-white rounded-[4px] border border-slate-200 shadow-sm p-6 flex flex-col max-h-[480px]">
-            <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-3 shrink-0">
-              <div>
-                <h3 className="text-xs font-bold text-blue-800 uppercase tracking-wider">Répartition des Expositions Nettes par Catégorie</h3>
-                <p className="text-[10px] text-[#1a2542] mt-0.5 font-semibold">Classement des portefeuilles selon la réglementation BCEAO</p>
+          <div className="bg-white rounded-[4px] border border-slate-200 shadow-sm overflow-hidden flex flex-col max-h-[520px]">
+            {/* Header Banner moderne */}
+            <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-[#1a2542] text-white shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-1 h-7 rounded-full bg-indigo-400" />
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-white">Répartition des Expositions Nettes par Catégorie</h3>
+                  <p className="text-[10px] text-indigo-200">Classement des portefeuilles selon la réglementation BCEAO</p>
+                </div>
               </div>
-              <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded border border-indigo-100 uppercase tracking-wide">
+              <span className="text-[10px] font-bold text-indigo-200 bg-indigo-500/20 px-3 py-1 rounded border border-indigo-400/30 uppercase tracking-wider">
                 {CATEGORIES_EXPOSITIONS.length} Catégories
               </span>
             </div>
 
-            <div className="flex-1 overflow-y-auto pr-2 relative custom-scrollbar">
+            {/* En-tête de colonnes du tableau */}
+            <div className="flex items-center gap-4 px-6 py-2.5 bg-slate-50 border-b border-slate-200 text-[9.5px] font-extrabold text-blue-900 uppercase tracking-wider shrink-0 sticky top-0 z-10 shadow-2xs">
+              <div className="w-[35%] shrink-0">Catégorie d'exposition</div>
+              <div className="flex-1 pl-2">Distribution & Proportion Nette</div>
+              <div className="w-[20%] text-right shrink-0">Exposition Nette</div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-6 py-1 relative custom-scrollbar">
               {/* Background grid lines */}
               <div className="absolute left-[35%] right-[20%] top-0 bottom-0 flex justify-between pointer-events-none z-0 px-3">
                  <div className="w-px h-full bg-slate-100 border-r border-slate-200 border-dashed" />
@@ -299,7 +310,6 @@ export const RisqueCreditView: React.FC<RisqueCreditViewProps> = ({ solva, isSid
                     paddingTop: '9px',
                     paddingBottom: '9px',
                     borderBottom: '1px solid #f1f5f9',
-                    borderTop: idx === 0 ? '1px solid #f1f5f9' : undefined,
                   }}
                 >
                   {/* Label (Left aligned, fixed width) */}

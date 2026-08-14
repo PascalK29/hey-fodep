@@ -237,7 +237,7 @@ export default function App() {
           <div className="max-w-[1400px] mx-auto">
             {/* Section header (fixé au défilement) */}
             <div className="sticky top-0 z-10 bg-[#F4F7FA]/95 backdrop-blur-sm border-b border-slate-200 px-8 py-2.5">
-              <h1 className="text-[22px] font-bold text-blue-900 tracking-tight leading-none">
+              <h1 className="text-lg font-bold text-blue-900 tracking-tight leading-none">
                 {SECTION_LABELS[activeTab]}
               </h1>
             </div>
@@ -248,27 +248,27 @@ export default function App() {
               <div className="space-y-6">
                 {/* Ligne 1 : KPIs Exécutifs */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div className="bg-white rounded-[3px] border border-slate-200/60 shadow-sm p-5 flex flex-col justify-between transition-shadow hover:shadow-md">
-                    <h3 className="text-[11px] font-semibold uppercase tracking-wider text-blue-900">Ratio Global Solvabilité</h3>
-                    <div className="text-2xl font-black text-[#1a2542] tabular-nums mt-2">{Number(solva.ratios.total).toLocaleString('fr-FR', { maximumFractionDigits: 2 })}%</div>
-                    <div className="text-[10px] font-medium text-slate-400 mt-1">Seuil min. BCEAO : {Number(solva.normes[2].requis).toLocaleString('fr-FR', { maximumFractionDigits: 2 })}%</div>
+                  <div className="bg-white rounded-[3px] border border-slate-200/60 shadow-sm p-3.5 flex flex-col justify-between transition-shadow hover:shadow-md">
+                    <h3 className="text-[10px] font-bold uppercase tracking-wider text-blue-900">Ratio Global Solvabilité</h3>
+                    <div className="text-lg font-bold text-[#1a2542] tabular-nums mt-1">{Number(solva.ratios.total).toLocaleString('fr-FR', { maximumFractionDigits: 2 })}%</div>
+                    <div className="text-[9px] font-medium text-slate-400 mt-1">Seuil min. BCEAO : {Number(solva.normes[2].requis).toLocaleString('fr-FR', { maximumFractionDigits: 2 })}%</div>
                   </div>
 
-                  <div className="bg-white rounded-[3px] border border-slate-200/60 shadow-sm p-5 flex flex-col justify-between transition-shadow hover:shadow-md">
-                    <h3 className="text-[11px] font-semibold uppercase tracking-wider text-blue-900">Fonds Propres Effectifs</h3>
-                    <div className="text-2xl font-black text-[#1a2542] tabular-nums mt-2">{Number(solva.fondsPropres.effectifs).toLocaleString('fr-FR')}</div>
-                    <div className="text-[10px] font-medium text-slate-400 mt-1">En millions FCFA</div>
+                  <div className="bg-white rounded-[3px] border border-slate-200/60 shadow-sm p-3.5 flex flex-col justify-between transition-shadow hover:shadow-md">
+                    <h3 className="text-[10px] font-bold uppercase tracking-wider text-blue-900">Fonds Propres Effectifs</h3>
+                    <div className="text-lg font-bold text-[#1a2542] tabular-nums mt-1">{Number(solva.fondsPropres.effectifs).toLocaleString('fr-FR')}</div>
+                    <div className="text-[9px] font-medium text-slate-400 mt-1">En millions FCFA</div>
                   </div>
 
-                  <div className="bg-white rounded-[3px] border border-slate-200/60 shadow-sm p-5 flex flex-col justify-between transition-shadow hover:shadow-md">
-                    <h3 className="text-[11px] font-semibold uppercase tracking-wider text-blue-900">Total APR</h3>
-                    <div className="text-2xl font-black text-[#1a2542] tabular-nums mt-2">{Number(solva.apr).toLocaleString('fr-FR')}</div>
-                    <div className="text-[10px] font-medium text-slate-400 mt-1">Actifs Pondérés des Risques</div>
+                  <div className="bg-white rounded-[3px] border border-slate-200/60 shadow-sm p-3.5 flex flex-col justify-between transition-shadow hover:shadow-md">
+                    <h3 className="text-[10px] font-bold uppercase tracking-wider text-blue-900">Total APR</h3>
+                    <div className="text-lg font-bold text-[#1a2542] tabular-nums mt-1">{Number(solva.apr).toLocaleString('fr-FR')}</div>
+                    <div className="text-[9px] font-medium text-slate-400 mt-1">Actifs Pondérés des Risques</div>
                   </div>
 
-                  <div className={`rounded-[3px] border p-5 flex flex-col justify-center ${isConforme ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100'}`}>
-                    <h3 className={`text-[10px] font-bold uppercase tracking-wide mb-2 ${isConforme ? 'text-emerald-600' : 'text-rose-600'}`}>Conformité Globale</h3>
-                    <div className={`text-xl font-black ${isConforme ? 'text-emerald-700' : 'text-rose-700'}`}>
+                  <div className={`rounded-[3px] border p-3.5 flex flex-col justify-center ${isConforme ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100'}`}>
+                    <h3 className={`text-[10px] font-bold uppercase tracking-wide mb-1 ${isConforme ? 'text-emerald-600' : 'text-rose-600'}`}>Conformité Globale</h3>
+                    <div className={`text-base font-bold ${isConforme ? 'text-emerald-700' : 'text-rose-700'}`}>
                       {isConforme ? 'CONFORME' : 'INFRACTION'}
                     </div>
                   </div>

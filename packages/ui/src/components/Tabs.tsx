@@ -11,11 +11,12 @@ interface TabsProps {
   activeTab: string;
   onChange: (id: string) => void;
   isSidebarCollapsed?: boolean;
+  variant?: 'indigo' | 'deepblue';
 }
 
-export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onChange, isSidebarCollapsed }) => {
+export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onChange, isSidebarCollapsed, variant = 'indigo' }) => {
   return (
-    <div className={`inline-flex p-1 bg-slate-100 rounded-xl border border-slate-200/30 transition-all duration-200 ${isSidebarCollapsed === false ? 'gap-1' : 'gap-1.5'}`}>
+    <div className={`inline-flex p-1 bg-slate-100 rounded border border-slate-200/30 transition-all duration-200 ${isSidebarCollapsed === false ? 'gap-1' : 'gap-1.5'}`}>
       {tabs.map((tab, index) => {
         const isActive = activeTab === tab.id;
         return (
@@ -26,12 +27,12 @@ export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onChange, isSidebar
             <button
               onClick={() => onChange(tab.id)}
               className={`
-                flex items-center space-x-2 rounded-lg font-medium transition-all duration-200 whitespace-nowrap
+                flex items-center space-x-2 rounded font-medium transition-all duration-200 whitespace-nowrap
                 ${isSidebarCollapsed === false 
                   ? 'text-[10.5px] px-2 py-1.5' 
                   : 'text-xs px-4 py-1.5'}
                 ${isActive 
-                  ? 'bg-indigo-600 text-white shadow-sm' 
+                  ? (variant === 'deepblue' ? 'bg-[#1a2542] text-white shadow-sm' : 'bg-indigo-600 text-white shadow-sm')
                   : 'text-blue-900/60 hover:text-blue-900 hover:bg-white/35'}
               `}
             >

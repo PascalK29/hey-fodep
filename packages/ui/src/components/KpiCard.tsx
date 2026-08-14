@@ -63,16 +63,16 @@ export const KpiCard: React.FC<KpiCardProps> = ({
   const styles = colorStyles[colorScheme];
 
   return (
-    <div className={`rounded-[4px] border shadow-sm p-4 flex flex-col justify-between transition-all duration-300 hover:shadow-md ${styles.bg} ${styles.border} ${className}`}>
-      <div className="mb-2">
-        <h3 className="text-[11px] font-semibold uppercase tracking-wider text-blue-900 leading-tight">{title}</h3>
+    <div className={`rounded-[4px] border shadow-sm p-3 flex flex-col justify-between transition-all duration-300 hover:shadow-md ${styles.bg} ${styles.border} ${className}`}>
+      <div className="mb-1.5">
+        <h3 className="text-[10px] font-bold uppercase tracking-wider text-blue-900 leading-tight">{title}</h3>
       </div>
       <div className="flex items-baseline space-x-1 mt-auto">
-        <span className={`text-xl font-bold tracking-tight ${styles.value}`}>
+        <span className={`text-base font-bold tracking-tight ${styles.value}`}>
           {value}
         </span>
         {unit && (
-          <span className="text-xs font-semibold text-slate-400">{unit}</span>
+          <span className="text-[10px] font-semibold text-slate-400">{unit}</span>
         )}
       </div>
     </div>

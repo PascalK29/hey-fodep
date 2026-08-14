@@ -62,13 +62,13 @@ export const RisqueOperationnelView: React.FC<RisqueOperationnelViewProps> = ({ 
           unit="M FCFA" 
           colorScheme="blue" 
         />
-        <div className="bg-[#1a2542] rounded-[3px] border border-indigo-900 shadow-sm p-4 flex flex-col justify-between text-white hover:shadow-md transition-all duration-300">
-          <div className="mb-2">
-            <h3 className="text-[11px] font-bold uppercase tracking-wider text-indigo-200 leading-tight">Total APR Opérationnel</h3>
+        <div className="bg-[#1a2542] rounded-[3px] border border-indigo-900 shadow-sm p-3 flex flex-col justify-between text-white hover:shadow-md transition-all duration-300">
+          <div className="mb-1.5">
+            <h3 className="text-[10px] font-bold uppercase tracking-wider text-indigo-200 leading-tight">Total APR Opérationnel</h3>
           </div>
           <div className="flex items-baseline space-x-1 mt-auto">
-            <span className="text-xl font-bold tracking-tight text-white">{formatMoney(totalAprOp)}</span>
-            <span className="text-xs font-semibold text-indigo-300">M FCFA</span>
+            <span className="text-base font-bold tracking-tight text-white">{formatMoney(totalAprOp)}</span>
+            <span className="text-[10px] font-semibold text-indigo-300">M FCFA</span>
           </div>
         </div>
       </div>

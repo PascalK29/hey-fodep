@@ -1,6 +1,6 @@
 import type { DispruDef } from "../core/types";
 import { ratioPercent } from "../core/money";
-import { computed, input } from "./helpers";
+import { computed } from "./helpers";
 
 /**
  * Ratios de solvabilité (EP02) et total des actifs pondérés des risques (EP08).

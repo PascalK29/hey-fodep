@@ -30,8 +30,6 @@ export const RisqueOperationnelView: React.FC<RisqueOperationnelViewProps> = ({ 
   const aprAS = getVal("EP23_TOTAL_APR");
   
   const totalPertesMontant = CATEGORIES_PERTES.reduce((acc, cat) => acc + getVal(`EP22_${cat.id}_MONTANT`), 0);
-  const totalExigences = exigenceAIB + exigenceAS;
-  const totalAprOp = aprAIB + aprAS;
 
   const tabOptions: TabOption[] = [
     { id: 'aib', label: 'Indicateur de Base' },

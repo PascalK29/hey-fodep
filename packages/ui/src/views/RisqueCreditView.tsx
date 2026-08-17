@@ -63,7 +63,7 @@ export const RisqueCreditView: React.FC<RisqueCreditViewProps> = ({ solva, isSid
     };
   });
 
-  const sortedCategories = [...categoryRows].sort((a, b) => b.netTotal - a.netTotal);
+
   const tabOptions: TabOption[] = [
     { id: 'synthese', label: 'Synthèse du risque' },
     { id: 'bilan', label: 'Expositions Bilan' },
@@ -394,7 +394,7 @@ export const RisqueCreditView: React.FC<RisqueCreditViewProps> = ({ solva, isSid
                   const souff = getVal(`EP09_${cat.id}_CS`) + getVal(`EP09_${cat.id}_CRE`);
                   const deduc = getVal(`EP09_${cat.id}_PROV`) + getVal(`EP09_${cat.id}_DED`);
                   const net = getVal(`EP09_${cat.id}_NET`);
-                  const pct = totalExpositionNetteBilan > 0 ? (net / totalExpositionNetteBilan) * 100 : 0;
+
 
                   return (
                     <tr key={`EP09_${cat.id}`} className="hover:bg-indigo-50/30 transition-colors group">
@@ -465,7 +465,7 @@ export const RisqueCreditView: React.FC<RisqueCreditViewProps> = ({ solva, isSid
                   const apres = getVal(`EP10_${cat.id}_BRUT_APRES`);
                   const prov = getVal(`EP10_${cat.id}_PROV`);
                   const net = getVal(`EP10_${cat.id}_NET`);
-                  const pct = totalExpositionNetteHorsBilan > 0 ? (net / totalExpositionNetteHorsBilan) * 100 : 0;
+
 
                   return (
                     <tr key={`EP10_${cat.id}`} className="hover:bg-indigo-50/30 transition-colors group">

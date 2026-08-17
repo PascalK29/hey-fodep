@@ -154,18 +154,11 @@ export const FondsPropresView: React.FC<FondsPropresViewProps> = ({ solva, isSid
   const effectifs = getVal('FPI41');
 
   const total = cet1 + at1 + t2;
-  const share = (val: number) => (total > 0 ? (val / total) * 100 : 0);
 
   const apr = solva.apr.toNumber();
-  const minCet1Req = solva.normes.find(n => n.code === 'SOLVA_CET1')?.requis.toNumber() || 5.0;
-  const minT1Req = solva.normes.find(n => n.code === 'SOLVA_T1')?.requis.toNumber() || 6.0;
   const minTotalReq = solva.normes.find(n => n.code === 'SOLVA_TOTAL')?.requis.toNumber() || 8.0;
 
   const totalExigenceMontant = (apr * minTotalReq) / 100;
-
-  const totalSurplus = effectifs - totalExigenceMontant;
-
-  const solvencyCoverage = totalExigenceMontant > 0 ? (effectifs / totalExigenceMontant) * 100 : 0;
 
 
   const renderBloc = (bloc: Bloc, isLast: boolean) => {

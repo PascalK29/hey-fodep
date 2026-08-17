@@ -47,10 +47,6 @@ export const RisqueMarcheView: React.FC<RisqueMarcheViewProps> = ({ solva, isSid
   const totalPositionsTitres = tauxSpecifique + tauxGeneral + actionsSpecifique + actionsGeneral;
 
   // Calcul des pourcentages de répartition
-  const pctTaux = exigenceTotale > 0 ? (exigenceTaux / exigenceTotale) * 100 : 0;
-  const pctActions = exigenceTotale > 0 ? (exigenceActions / exigenceTotale) * 100 : 0;
-  const pctChange = exigenceTotale > 0 ? (exigenceChange / exigenceTotale) * 100 : 0;
-  const pctMatPrem = exigenceTotale > 0 ? (exigenceMatPrem / exigenceTotale) * 100 : 0;
 
   const totalAprGlobal = solva.apr?.toNumber() || getVal("APR_TOTAL") || 0;
   const contributionGlobalPct = totalAprGlobal > 0 ? (aprTotal / totalAprGlobal) * 100 : 0;

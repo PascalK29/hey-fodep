@@ -35,6 +35,14 @@ import { GrandsRisquesView } from './views/GrandsRisquesView';
 // --- Types ---
 type TabId = 'dashboard' | 'fonds-propres' | 'credit' | 'marche' | 'operationnel' | 'grands-risques' | 'import' | 'export';
 
+interface ImportResult {
+  success: boolean;
+  title: string;
+  fileName: string;
+  indicatorsFound: number;
+  message: string;
+}
+
 const SECTION_LABELS: Record<TabId, string> = {
   dashboard: 'Tableau de bord',
   'fonds-propres': 'Fonds propres & solvabilité',

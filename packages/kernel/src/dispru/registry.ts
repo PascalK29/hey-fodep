@@ -99,7 +99,11 @@ export function evaluate(
   // 1) Amorcer les postes saisis.
   for (const def of defs) {
     if (def.kind === "input") {
-      values.set(def.code, new Decimal(inputs[def.code] ?? 0));
+      let val = new Decimal(inputs[def.code] ?? 0);
+      if (def.sign === "deduction" && val.gt(0)) {
+        val = new Decimal(0);
+      }
+      values.set(def.code, val);
     }
   }
 

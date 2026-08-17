@@ -89,28 +89,23 @@ const EP23_CODES: DispruDef[] = LIGNES_METIER_AS.flatMap(lm => [
   input(`EP23_${lm.id}_PB_N1`, "EP23", `PB Année n-1 - ${lm.label}`),
   input(`EP23_${lm.id}_PB_N2`, "EP23", `PB Année n-2 - ${lm.label}`),
   input(`EP23_${lm.id}_PB_N3`, "EP23", `PB Année n-3 - ${lm.label}`),
-  computed(`EP23_${lm.id}_PB_MOY`, "EP23", `PB Moyen - ${lm.label}`, [`EP23_${lm.id}_PB_N1`, `EP23_${lm.id}_PB_N2`, `EP23_${lm.id}_PB_N3`], "average", (ctx) => {
-    const p1 = ctx.get(`EP23_${lm.id}_PB_N1`)?.toNumber() || 0;
-    const p2 = ctx.get(`EP23_${lm.id}_PB_N2`)?.toNumber() || 0;
-    const p3 = ctx.get(`EP23_${lm.id}_PB_N3`)?.toNumber() || 0;
-    // Approche standard: la somme pour la ligne de métier prend aussi en compte les valeurs négatives,
-    // mais si le total de toutes les lignes pour l'année est négatif, il est exclu du numérateur ou mis à 0. 
-    // Pour simplifier ici, on fait la moyenne brute.
-    return (p1 + p2 + p3) / 3;
-  }),
-  computed(`EP23_${lm.id}_EXIGENCE`, "EP23", `Exigence - ${lm.label}`, [`EP23_${lm.id}_PB_MOY`], `PB_MOY * ${lm.beta}`, (ctx) => {
-    const moy = ctx.get(`EP23_${lm.id}_PB_MOY`)?.toNumber() || 0;
-    return Math.max(0, moy) * lm.beta;
-  })
 ]);
 
 // Totaux EP23
 EP23_CODES.push(computed(
   "EP23_TOTAL_EXIGENCE", "EP23", "Exigence globale AS", 
-  LIGNES_METIER_AS.map(lm => `EP23_${lm.id}_EXIGENCE`), 
-  "sum(Exigences)", 
+  LIGNES_METIER_AS.flatMap(lm => [`EP23_${lm.id}_PB_N1`, `EP23_${lm.id}_PB_N2`, `EP23_${lm.id}_PB_N3`]), 
+  "Moyenne des sommes annuelles", 
   (ctx) => {
-    return LIGNES_METIER_AS.reduce((acc, lm) => acc + (ctx.get(`EP23_${lm.id}_EXIGENCE`)?.toNumber() || 0), 0);
+    let year1 = 0;
+    let year2 = 0;
+    let year3 = 0;
+    for (const lm of LIGNES_METIER_AS) {
+      year1 += (ctx.get(`EP23_${lm.id}_PB_N1`)?.toNumber() || 0) * lm.beta;
+      year2 += (ctx.get(`EP23_${lm.id}_PB_N2`)?.toNumber() || 0) * lm.beta;
+      year3 += (ctx.get(`EP23_${lm.id}_PB_N3`)?.toNumber() || 0) * lm.beta;
+    }
+    return (Math.max(0, year1) + Math.max(0, year2) + Math.max(0, year3)) / 3;
   }
 ));
 EP23_CODES.push(computed(

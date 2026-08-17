@@ -27,17 +27,17 @@ export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onChange, isSidebar
             <button
               onClick={() => onChange(tab.id)}
               className={`
-                flex items-center space-x-2 rounded font-medium transition-all duration-200 whitespace-nowrap
+                flex items-center space-x-2 rounded font-semibold transition-all duration-200 whitespace-nowrap
                 ${isSidebarCollapsed === false 
-                  ? 'text-[10.5px] px-2 py-1.5' 
+                  ? 'text-[10.5px] px-2.5 py-1.5' 
                   : 'text-xs px-4 py-1.5'}
                 ${isActive 
                   ? (variant === 'deepblue' ? 'bg-[#1a2542] text-white shadow-sm' : 'bg-indigo-600 text-white shadow-sm')
-                  : 'text-blue-900/60 hover:text-blue-900 hover:bg-white/35'}
+                  : 'text-blue-900 hover:text-blue-950 hover:bg-white/80'}
               `}
             >
               {tab.icon && (
-                <span className={`transition-colors duration-200 ${isActive ? 'text-white' : 'text-slate-400'}`}>
+                <span className={`transition-colors duration-200 ${isActive ? 'text-white' : 'text-blue-900'}`}>
                   {tab.icon}
                 </span>
               )}

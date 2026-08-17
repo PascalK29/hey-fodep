@@ -64,8 +64,8 @@ describe("Solvabilité (EP02) — ratios et normes", () => {
     expect(a.normes.map((n) => n.situation)).toEqual(["conforme", "conforme", "conforme"]);
   });
 
-  it("déclare une infraction lorsque le ratio total passe sous 8 %", () => {
-    // APR porté à 200000 -> ratio total = 14100/200000 = 7,05 % < 8 %
+  it("déclare une infraction lorsque le ratio total passe sous 9 %", () => {
+    // APR porté à 200000 -> ratio total = 14100/200000 = 7,05 % < 9 %
     const a = analyseSolvabilite({ ...INPUTS, APR_TOTAL: 200000 });
     expect(a.ratios.total.toNumber()).toBe(7.05);
     const total = a.normes.find((n) => n.code === "SOLVA_TOTAL")!;

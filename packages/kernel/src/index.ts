@@ -54,7 +54,7 @@ export {
 /** Métadonnées de version du référentiel prudentiel implémenté. */
 export const KERNEL_META = {
   version: "0.1.0",
-  dispositif: "Dispositif prudentiel UMOA (Bâle II/III) — en vigueur depuis le 1er janvier 2018",
+  dispositif: "Dispositif prudentiel UMOA (Bâle II/III), en vigueur depuis le 1er janvier 2018",
   instruction: "Instruction BCEAO n°005-08-2017 (FODEP)",
   sectionsImplementees: ["fonds-propres", "solvabilite", "apr", "risque-credit", "risque-operationnel"],
 } as const;

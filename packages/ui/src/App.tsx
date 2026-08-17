@@ -16,13 +16,17 @@ import {
   Type,
   Upload,
   Download,
-  Calendar
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react';
+import { useRef } from 'react';
+import { downloadExcelTemplate, parseExcelFile, parseOfficialFodepFile, downloadOfficialFodepTemplate } from './lib/excel';
 import type { LucideIcon } from 'lucide-react';
-import { ResponsiveContainer, Cell, PieChart, Pie, Tooltip } from 'recharts';
+
 
 import { analyseSolvabilite, type SolvabiliteAnalyse } from '@heyfodep/kernel';
 import { FondsPropresView } from './views/FondsPropresView';
+import { ExportView } from './views/ExportView';
 import { RisqueCreditView } from './views/RisqueCreditView';
 import { RisqueOperationnelView } from './views/RisqueOperationnelView';
 import { RisqueMarcheView } from './views/RisqueMarcheView';
@@ -50,73 +54,95 @@ export default function App() {
   const [langue, setLangue] = useState<'fr' | 'en'>('fr');
   const [font, setFont] = useState('Segoe UI');
   const [openSetting, setOpenSetting] = useState<'theme' | 'langue' | 'police' | null>('theme');
+  const [importType, setImportType] = useState<'template' | 'fodep'>('template');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
   
   // Real data state
-  const [analysis, setAnalysis] = useState<SolvabiliteAnalyse | null>(null);
-  const [activeDonutIndex, setActiveDonutIndex] = useState<number | null>(null);
-
-  // Jeu de données de démonstration (arrêté 30/06/2026, montants en millions FCFA)
-  const SAMPLE_INPUTS: Record<string, number> = {
-    FPI01: 50000, FPI02: 2000, FPI03: 8000, FPI04: 3000, FPI05: 5000, FPI06: 10000, FPI07: 0,
-    FPI09: 0, FPI10: 0, IM12: 0, ID09: 0, PA14: 0, PA32: 0, FPI11: 0, PA07: 0, IM06: 0, IM10: 0, PR04: 0, FPI12: 0, FPI13: 0,
-    FPI23: 10000, FPI24: 500, FPI25: 0,
-    PA15: 0, PA23: 0, PA33: 0, FPI27: 0,
-    FPI40: 20000,
-    RC63: 120000, RM39: 15000, RO13: 8000,
-  };
+  const [currentInputs, setCurrentInputs] = useState<Record<string, number>>(() => {
+    try {
+      const saved = localStorage.getItem('fodep_data');
+      if (saved) return JSON.parse(saved);
+    } catch(e) {}
+    return {};
+  });
+  const [analysis, setAnalysis] = useState<SolvabiliteAnalyse>(() => analyseSolvabilite(currentInputs));
 
   useEffect(() => {
-    fetch('/api/solvabilite/arrete-2026')
-      .then(r => r.json())
-      .then(data => {
-        const inputs = data?.inputs && Object.keys(data.inputs).length ? data.inputs : SAMPLE_INPUTS;
-        setAnalysis(analyseSolvabilite(inputs));
-      })
-      .catch(() => setAnalysis(analyseSolvabilite(SAMPLE_INPUTS)));
-  }, []);
+    localStorage.setItem('fodep_data', JSON.stringify(currentInputs));
+  }, [currentInputs]);
 
-  if (!analysis) {
-    return <div className="flex h-screen items-center justify-center bg-[#F4F7FA] text-[#1a2542] font-semibold">Chargement des données BCEAO...</div>;
-  }
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      let data: Record<string, number>;
+      if (importType === 'fodep') {
+        data = await parseOfficialFodepFile(file);
+      } else {
+        data = await parseExcelFile(file);
+      }
+      
+      const foundCount = Object.keys(data).length;
+      
+      if (foundCount === 0) {
+        setImportResult({
+          success: false,
+          title: "Fichier vide",
+          fileName: file.name,
+          indicatorsFound: 0,
+          message: "Le fichier est bien reconnu, mais aucune donnée n'a été saisie. Veuillez remplir les valeurs avant de l'importer."
+        });
+      } else {
+        setImportResult({
+          success: true,
+          title: "Importation validée",
+          fileName: file.name,
+          indicatorsFound: foundCount,
+          message: "L'importation a réussi. Les données ont été validées et mises à jour dans le moteur de calcul."
+        });
+        
+        // Si c'est le fichier FODEP complet, on écrase les anciennes données pour ne pas garder de résidus.
+        // Sinon (template), on fusionne avec l'existant.
+        const newInputs = importType === 'fodep' ? data : { ...currentInputs, ...data };
+        setCurrentInputs(newInputs);
+        setAnalysis(analyseSolvabilite(newInputs));
+      }
+    } catch (error: any) {
+      console.error('Erreur lors de l\'import:', error);
+      
+      let message = "Une erreur inattendue s'est produite lors de la lecture du fichier.";
+      if (error.message === "SHEET_ERROR") {
+        message = "Ce fichier ne contient aucune des feuilles attendues (ex: fonds-propres, solvabilite). Assurez-vous d'utiliser le bon Modèle de Saisie.";
+      } else if (error.message === "SHEET_ERROR_FODEP") {
+        message = "Ce fichier ne contient pas les feuilles réglementaires BCEAO (ex: EP01, EP03). Il ne semble pas être un Fichier FODEP Officiel.";
+      }
+
+      setImportResult({
+        success: false,
+        title: "Fichier non reconnu",
+        fileName: file.name,
+        indicatorsFound: 0,
+        message
+      });
+    } finally {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
 
   const solva = analysis;
   const isConforme = solva.normes.every(n => n.situation === 'conforme');
 
-  const APR_DONUT = [
-    { name: 'Risque de Crédit', value: Number(solva.valeurs.get('RC63')) || 120000, color: '#3b49df' }, // Using RC63 from mock or kernel
-    { name: 'Risque de Marché', value: Number(solva.valeurs.get('EP39_TOTAL_APR')) || Number(solva.valeurs.get('RM39')) || 15000, color: '#0ea5e9' },
-    { name: 'Risque Opérationnel', value: Number(solva.valeurs.get('RO14')) || Number(solva.valeurs.get('RO13')) || 8000, color: '#f43f5e' },
-  ];
-
-  const totalAprValue = APR_DONUT.reduce((sum, item) => sum + item.value, 0);
-  const dominantIndex = APR_DONUT.reduce(
-    (maxIdx, item, idx, arr) => (item.value > arr[maxIdx].value ? idx : maxIdx),
-    0
-  );
-
-  const selectedIndex = activeDonutIndex !== null ? activeDonutIndex : dominantIndex;
-  const selectedItem = APR_DONUT[selectedIndex];
-  const selectedPercentage = totalAprValue > 0 
-    ? ((selectedItem.value / totalAprValue) * 100).toFixed(1) 
-    : '0.0';
-
-  const getShortLabel = (name: string) => {
-    if (name.includes('Crédit')) return 'Crédit';
-    if (name.includes('Marché')) return 'Marché';
-    if (name.includes('Opérationnel')) return 'Opérationnel';
-    return name;
-  };
-
-  const FP_DATA = [
-    { rank: 1, name: 'CET1 Brut (Capital + Réserves)', pct: Math.round((Number(solva.fondsPropres.cet1) / Number(solva.fondsPropres.effectifs)) * 100) || 75 },
-    { rank: 2, name: 'Total AT1', pct: Math.round((Number(solva.fondsPropres.at1) / Number(solva.fondsPropres.effectifs)) * 100) || 5 },
-    { rank: 3, name: 'Total T2', pct: Math.round((Number(solva.fondsPropres.t2) / Number(solva.fondsPropres.effectifs)) * 100) || 20 },
-  ];
-
   const totalGrandsRisques = Number(solva.valeurs.get('EP40_TOTAL_EXPOSITIONS')) || 0;
-  const fpEffectifs = Number(solva.fondsPropres.effectifs) || 1;
-  const ratioGrandsRisques = (totalGrandsRisques / fpEffectifs) * 100;
+  const fpEffectifs = Number(solva.fondsPropres.effectifs) || 0;
+  const ratioGrandsRisques = fpEffectifs === 0 ? 0 : (totalGrandsRisques / fpEffectifs) * 100;
   const isGrandsRisquesWarning = ratioGrandsRisques > 800;
+  const apr = Number(solva.apr);
+  const exigenceTotale = (apr * 9) / 100;
+  const surplusFP = fpEffectifs - exigenceTotale;
 
   return (
     <div className="flex flex-col h-screen bg-[#F4F7FA] font-sans text-slate-800 overflow-hidden" style={{ fontFamily: font }}>
@@ -202,17 +228,17 @@ export default function App() {
               <NavItem icon={LayoutDashboard} label="Tableau de bord" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} isCollapsed={isCollapsed} />
             </NavSection>
 
+            <NavSection title="Données & Échanges" isCollapsed={isCollapsed}>
+              <NavItem icon={Upload} label="Importation" active={activeTab === 'import'} onClick={() => setActiveTab('import')} isCollapsed={isCollapsed} />
+              <NavItem icon={Download} label="Exportation" active={activeTab === 'export'} onClick={() => setActiveTab('export')} isCollapsed={isCollapsed} />
+            </NavSection>
+
             <NavSection title="États FODEP" isCollapsed={isCollapsed}>
               <NavItem icon={ShieldCheck} label="Fonds propres & solvabilité" active={activeTab === 'fonds-propres'} onClick={() => setActiveTab('fonds-propres')} isCollapsed={isCollapsed} />
               <NavItem icon={Briefcase} label="Risque de crédit" active={activeTab === 'credit'} onClick={() => setActiveTab('credit')} isCollapsed={isCollapsed} />
               <NavItem icon={TrendingUp} label="Risque de marché" active={activeTab === 'marche'} onClick={() => setActiveTab('marche')} isCollapsed={isCollapsed} />
               <NavItem icon={AlertTriangle} label="Risque opérationnel" active={activeTab === 'operationnel'} onClick={() => setActiveTab('operationnel')} isCollapsed={isCollapsed} />
               <NavItem icon={FileSpreadsheet} label="Grands risques" active={activeTab === 'grands-risques'} onClick={() => setActiveTab('grands-risques')} isCollapsed={isCollapsed} />
-            </NavSection>
-
-            <NavSection title="Données & Échanges" isCollapsed={isCollapsed}>
-              <NavItem icon={Upload} label="Importation" active={activeTab === 'import'} onClick={() => setActiveTab('import')} isCollapsed={isCollapsed} />
-              <NavItem icon={Download} label="Exportation" active={activeTab === 'export'} onClick={() => setActiveTab('export')} isCollapsed={isCollapsed} />
             </NavSection>
           </div>
 
@@ -236,8 +262,8 @@ export default function App() {
         {/* Content Area */}
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-[1400px] mx-auto">
-            {/* Section header (fixé au défilement) */}
-            <div className="sticky top-0 z-10 bg-[#F4F7FA]/95 backdrop-blur-sm border-b border-slate-200 px-8 py-2.5">
+            {/* Section header (fixé au défilement - 100% opaque) */}
+            <div className="sticky top-0 z-30 bg-[#F4F7FA] border-b border-slate-200 px-8 h-12 flex items-center shadow-xs">
               <h1 className="text-lg font-bold text-blue-900 tracking-tight leading-none">
                 {SECTION_LABELS[activeTab]}
               </h1>
@@ -264,7 +290,7 @@ export default function App() {
                   <div className="bg-white rounded-[3px] border border-slate-200/60 shadow-sm p-3.5 flex flex-col justify-between transition-shadow hover:shadow-md">
                     <h3 className="text-[10px] font-bold uppercase tracking-wider text-blue-900">Total APR</h3>
                     <div className="text-lg font-bold text-[#1a2542] tabular-nums mt-1">{Number(solva.apr).toLocaleString('fr-FR')}</div>
-                    <div className="text-[9px] font-medium text-slate-400 mt-1">Actifs Pondérés par le Risque</div>
+                    <div className="text-[9px] font-medium text-slate-400 mt-1">En millions FCFA</div>
                   </div>
 
                   <div className={`rounded-[3px] border p-3.5 flex flex-col justify-center ${isConforme ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100'}`}>
@@ -275,180 +301,117 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Ligne 2 : Analyse Détaillée */}
+                {/* Ligne 2 : Tableau de Conformité Prudentielle BCEAO */}
                 <div className="flex flex-col lg:flex-row gap-6">
-                  
-                  {/* Carte 1 : Répartition des Risques (Donut) */}
-                  <div className="bg-white rounded-[3px] border border-slate-200/60 shadow-sm flex flex-col w-full lg:w-[40%]">
-                    <div className="bg-slate-50/50 px-5 py-3 border-b border-slate-100 rounded-t-[3px]">
-                      <h2 className="text-xs font-bold uppercase tracking-wider text-blue-900">Profil de Risque (APR)</h2>
+
+                  {/* Tableau de Conformité BCEAO */}
+                  <div className="bg-white rounded-[3px] border border-slate-200/60 shadow-sm overflow-hidden flex flex-col flex-1">
+                    <div className="bg-[#1a2542] px-5 py-3 flex justify-between items-center">
+                      <h2 className="text-xs font-bold uppercase tracking-wider text-white">Ratios Prudentiels BCEAO (Pilier 1)</h2>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${isConforme ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}`}>
+                        {isConforme ? 'CONFORME' : 'INFRACTION'}
+                      </span>
                     </div>
-                    <div className="p-5 flex-1 flex flex-col items-center justify-center">
-                      <div className="flex flex-row items-center justify-between h-[200px] w-full gap-4">
-                        {/* 1. Graphique Donut */}
-                        <div className="w-[55%] h-full flex items-center justify-center relative">
-                          <ResponsiveContainer width="100%" height="100%">
-                            <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-                              <Pie
-                                data={APR_DONUT}
-                                cx="50%"
-                                cy="50%"
-                                innerRadius="55%"
-                                outerRadius="75%"
-                                paddingAngle={4}
-                                dataKey="value"
-                                onMouseEnter={(_, index) => setActiveDonutIndex(index)}
-                                onMouseLeave={() => setActiveDonutIndex(null)}
-                              >
-                                {APR_DONUT.map((entry, index) => (
-                                  <Cell 
-                                    key={`cell-${index}`} 
-                                    fill={entry.color} 
-                                    style={{
-                                      outline: 'none',
-                                      cursor: 'pointer',
-                                      opacity: activeDonutIndex === null || activeDonutIndex === index ? 1 : 0.55,
-                                      transition: 'opacity 0.2s ease-in-out'
-                                    }}
-                                  />
-                                ))}
-                              </Pie>
-                              <Tooltip 
-                                cursor={false}
-                                position={{ x: 17, y: -75 }}
-                                allowEscapeViewBox={{ x: true, y: true }}
-                                wrapperStyle={{ pointerEvents: 'none' }}
-                                content={({ active, payload }: any) => {
-                                  if (active && payload && payload.length) {
-                                    const data = payload[0].payload;
-                                    const total = APR_DONUT.reduce((sum, item) => sum + item.value, 0);
-                                    const percentage = total > 0 ? ((data.value / total) * 100).toFixed(1) : '0.0';
-                                    return (
-                                      <div className="bg-white text-blue-900 p-3 rounded-[8px] shadow-xl border border-blue-900 flex flex-col space-y-1.5 w-44">
-                                        <div className="flex items-center space-x-2 border-b border-slate-100 pb-1.5">
-                                          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: data.color }} />
-                                          <span className="text-[10px] font-extrabold uppercase tracking-wide text-blue-900 truncate">APR {data.name}</span>
-                                        </div>
-                                        <div className="flex flex-col pt-0.5">
-                                          <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider leading-none">Valeur</span>
-                                          <span className="text-xs font-black text-blue-900 mt-1">{Number(data.value).toLocaleString('fr-FR')} M FCFA</span>
-                                        </div>
-                                        <div className="flex flex-col">
-                                          <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider leading-none">Proportion</span>
-                                          <span className="text-xs font-black text-blue-900 mt-1">{percentage}%</span>
-                                        </div>
-                                      </div>
-                                    );
-                                  }
-                                  return null;
-                                }}
-                              />
-                            </PieChart>
-                          </ResponsiveContainer>
-                          
-                          {/* Affichage interactif au centre */}
-                          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-1">
-                            <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-400 leading-none">
-                              APR
-                            </span>
-                            <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-400 mt-1 leading-none">
-                              {getShortLabel(selectedItem.name)}
-                            </span>
-                            <span className="text-lg font-black text-blue-900 mt-1.5 leading-none">
-                              {selectedPercentage}%
-                            </span>
+                    {/* En-tête colonnes */}
+                    <div className="grid grid-cols-4 px-5 py-2 bg-slate-50 border-b border-slate-100 text-[9.5px] font-extrabold text-blue-900 uppercase tracking-wider">
+                      <div>Norme réglementaire</div>
+                      <div className="text-center">Ratio Observé</div>
+                      <div className="text-center">Seuil Min. BCEAO</div>
+                      <div className="text-center">Statut</div>
+                    </div>
+                    <div className="divide-y divide-slate-100">
+                      {solva.normes.map((norme) => {
+                        const conforme = norme.situation === 'conforme';
+                        const nonCalc = norme.situation === 'non_calculable';
+                        return (
+                          <div key={norme.code} className="grid grid-cols-4 px-5 py-3 hover:bg-slate-50/60 transition-colors items-center">
+                            <div>
+                              <div className="text-[11.5px] font-semibold text-[#1a2542] leading-tight">{norme.libelle}</div>
+                            </div>
+                            <div className="text-center">
+                              <span className="text-sm font-black tabular-nums text-[#1a2542]">
+                                {nonCalc ? 'N/A' : `${Number(norme.observe).toFixed(2)}%`}
+                              </span>
+                            </div>
+                            <div className="text-center">
+                              <span className="text-sm font-bold tabular-nums text-slate-500">{Number(norme.requis).toFixed(2)}%</span>
+                            </div>
+                            <div className="flex justify-center">
+                              <span className={`text-[9.5px] font-bold px-2 py-0.5 rounded uppercase tracking-wide ${
+                                nonCalc
+                                  ? 'bg-slate-100 text-slate-500'
+                                  : conforme
+                                  ? 'bg-emerald-50 text-emerald-700'
+                                  : 'bg-rose-50 text-rose-700'
+                              }`}>
+                                {nonCalc ? 'N/A' : conforme ? 'Conforme' : 'Infraction'}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                        
-                        {/* 2. Légende disposée professionnellement */}
-                        <div className="w-[45%] flex flex-col justify-center space-y-3.5 pl-4 border-l border-slate-100 h-[85%]">
-                          {APR_DONUT.map((entry) => {
-                            const total = APR_DONUT.reduce((sum, item) => sum + item.value, 0);
-                            const percentage = total > 0 ? ((entry.value / total) * 100).toFixed(1) : '0.0';
-                            
-                            return (
-                              <div key={entry.name} className="flex flex-col space-y-1">
-                                <div className="flex items-center space-x-2">
-                                  <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
-                                  <span className="text-[10px] font-semibold text-slate-700 truncate leading-none">{entry.name}</span>
-                                </div>
-                                <div className="pl-3.5 flex items-baseline space-x-1">
-                                  <span className="text-[11px] font-black text-blue-900 leading-none">{Number(entry.value).toLocaleString('fr-FR')} M</span>
-                                  <span className="text-[8.5px] text-slate-400 font-bold leading-none">({percentage}%)</span>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
+                        );
+                      })}
                     </div>
                   </div>
 
-                  {/* Carte 2 : Fonds Propres (Barres Horizontales) */}
-                  <div className="bg-white rounded-[3px] border border-slate-200/60 shadow-sm overflow-hidden flex flex-col w-full lg:w-[30%]">
-                    <div className="bg-slate-50/50 px-5 py-3 border-b border-slate-100">
-                      <h2 className="text-xs font-bold uppercase tracking-wider text-blue-900">Qualité des Fonds Propres</h2>
-                    </div>
-                    <div className="p-5 flex-1 flex flex-col justify-center space-y-5">
-                      {FP_DATA.map((item) => (
-                        <div key={item.rank} className="flex flex-col">
-                          <div className="flex justify-between items-center mb-1.5">
-                            <span className="text-[13px] font-semibold text-gray-700 flex items-center gap-2">
-                              <span className="w-5 h-5 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-[10px]">{item.rank}</span>
-                              <span className="text-[12px]">{item.name}</span>
-                            </span>
-                            <span className="text-[12px] font-bold text-[#1a2542]">{item.pct} %</span>
-                          </div>
-                          <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                            <div 
-                              className="h-full rounded-full transition-all duration-1000"
-                              style={{ 
-                                width: `${item.pct}%`,
-                                backgroundColor: item.rank === 1 ? '#3b49df' : (item.rank === 2 ? '#6366f1' : '#818cf8'),
-                              }}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  {/* Chiffres Clés FODEP */}
+                  <div className="flex flex-col gap-4 w-full lg:w-[260px] shrink-0">
 
-                  {/* Carte 3 : Grands Risques & Alertes */}
-                  <div className="bg-white rounded-[3px] border border-slate-200/60 shadow-sm overflow-hidden flex flex-col justify-between w-full lg:w-[30%]">
-                    <div>
-                      <div className="bg-slate-50/50 px-5 py-3 border-b border-slate-100 flex flex-col">
-                        <h2 className="text-xs font-bold uppercase tracking-wider text-blue-900">Concentration (Grands Risques)</h2>
-                        <span className="text-[10px] text-slate-400 mt-0.5">Limite globale de 8 fois les fonds propres.</span>
-                      </div>
-                      
-                      <div className="p-5">
-                        <div className="flex justify-between items-end mb-2">
-                          <span className="text-2xl font-black text-[#1a2542] tabular-nums">{ratioGrandsRisques.toLocaleString('fr-FR', {maximumFractionDigits:1})}%</span>
-                          <span className="text-[11px] font-semibold text-slate-400">Limite 800%</span>
-                        </div>
-                        <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden flex">
-                          <div 
-                            className={`h-full transition-all duration-1000 ${isGrandsRisquesWarning ? 'bg-rose-500' : 'bg-emerald-500'}`}
-                            style={{ width: `${Math.min(ratioGrandsRisques / 8, 100)}%` }}
-                          />
-                        </div>
-                        {isGrandsRisquesWarning && (
-                          <div className="mt-3 flex items-center gap-2 text-rose-600 text-xs font-semibold bg-rose-50 p-2 rounded-[3px]">
-                            <AlertTriangle className="w-4 h-4" />
-                            Dépassement de la limite globale !
-                          </div>
-                        )}
+                    <div className="bg-white rounded-[3px] border border-slate-200/60 shadow-sm p-4 flex flex-col justify-between">
+                      <span className="text-[9.5px] font-bold uppercase tracking-wider text-blue-800">Fonds Propres Effectifs (FPI41)</span>
+                      <div className="mt-2">
+                        <span className="text-lg font-black text-[#1a2542] tabular-nums">{Number(solva.fondsPropres.effectifs).toLocaleString('fr-FR')}</span>
+                        <span className="text-[9px] font-semibold text-slate-400 ml-1.5">M FCFA</span>
                       </div>
                     </div>
-                    
-                    <div className="p-5 pt-0 mt-auto border-t border-slate-100">
-                      <button onClick={() => setActiveTab('grands-risques')} className="w-full text-center text-[12px] font-bold text-indigo-600 hover:text-indigo-800 transition-colors">
-                        Analyser les grands risques &rarr;
-                      </button>
+
+                    <div className="bg-white rounded-[3px] border border-slate-200/60 shadow-sm p-4 flex flex-col justify-between">
+                      <span className="text-[9.5px] font-bold uppercase tracking-wider text-blue-800">Total APR (Tous risques)</span>
+                      <div className="mt-2">
+                        <span className="text-lg font-black text-[#1a2542] tabular-nums">{Number(solva.apr).toLocaleString('fr-FR')}</span>
+                        <span className="text-[9px] font-semibold text-slate-400 ml-1.5">M FCFA</span>
+                      </div>
                     </div>
+
+                    <div className="bg-white rounded-[3px] border border-slate-200/60 shadow-sm p-4 flex flex-col justify-between">
+                      <span className="text-[9.5px] font-bold uppercase tracking-wider text-blue-800">Exigence min. FP (9% x APR)</span>
+                      <div className="mt-2">
+                        <span className="text-lg font-black text-[#1a2542] tabular-nums">{exigenceTotale.toLocaleString('fr-FR', { maximumFractionDigits: 0 })}</span>
+                        <span className="text-[9px] font-semibold text-slate-400 ml-1.5">M FCFA</span>
+                      </div>
+                    </div>
+
+                    <div className={`rounded-[3px] border shadow-sm p-4 flex flex-col justify-between ${
+                      surplusFP >= 0 ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100'
+                    }`}>
+                      <span className={`text-[9.5px] font-bold uppercase tracking-wider ${
+                        surplusFP >= 0 ? 'text-emerald-700' : 'text-rose-700'
+                      }`}>Surplus Prudentiel</span>
+                      <div className="mt-2">
+                        <span className={`text-lg font-black tabular-nums ${
+                          surplusFP >= 0 ? 'text-emerald-700' : 'text-rose-700'
+                        }`}>{surplusFP >= 0 ? '+' : ''}{surplusFP.toLocaleString('fr-FR', { maximumFractionDigits: 0 })}</span>
+                        <span className={`text-[9px] font-semibold ml-1.5 ${
+                          surplusFP >= 0 ? 'text-emerald-500' : 'text-rose-400'
+                        }`}>M FCFA</span>
+                      </div>
+                    </div>
+
+                    {isGrandsRisquesWarning && (
+                      <div className="bg-rose-50 border border-rose-100 rounded-[3px] p-3 flex items-start gap-2">
+                        <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                        <div>
+                          <div className="text-[10px] font-bold text-rose-700">Alerte Grands Risques</div>
+                          <div className="text-[9.5px] text-rose-600 mt-0.5">Limite globale dépassée ({ratioGrandsRisques.toFixed(0)}% / 800%)</div>
+                          <button onClick={() => setActiveTab('grands-risques')} className="text-[9.5px] font-bold text-rose-700 underline mt-1">Analyser</button>
+                        </div>
+                      </div>
+                    )}
+
                   </div>
 
                 </div>
+
+
               </div>
             ) : activeTab === 'fonds-propres' ? (
               <FondsPropresView solva={solva} isSidebarCollapsed={isCollapsed} />
@@ -457,64 +420,89 @@ export default function App() {
             ) : activeTab === 'operationnel' ? (
               <RisqueOperationnelView solva={solva} isSidebarCollapsed={isCollapsed} />
             ) : activeTab === 'marche' ? (
-              <RisqueMarcheView solva={solva} />
+              <RisqueMarcheView solva={solva} isSidebarCollapsed={isCollapsed} />
             ) : activeTab === 'grands-risques' ? (
               <GrandsRisquesView solva={solva} />
             ) : activeTab === 'import' ? (
-              <div className="max-w-3xl mt-4 fade-in">
-                <div className="bg-white rounded-[3px] shadow-[0_4px_14px_rgba(26,37,66,0.06)] p-8 flex flex-col h-full">
-                  <div className="w-12 h-12 rounded-[3px] bg-blue-50 flex items-center justify-center mb-6">
-                    <Upload className="w-6 h-6 text-[#3b49df]" />
+              <div className="max-w-2xl mt-8 mx-auto fade-in">
+                <div className="bg-white rounded-[3px] shadow-[0_4px_14px_rgba(26,37,66,0.06)] p-10 flex flex-col items-center text-center">
+                  <div className="w-14 h-14 rounded-[4px] bg-blue-50 flex items-center justify-center mb-5">
+                    <Upload className="w-7 h-7 text-[#3b49df]" />
                   </div>
-                  <h2 className="text-lg font-bold text-[#1a2542] mb-2">Importer des données depuis un fichier</h2>
-                  <p className="text-sm text-slate-500 mb-6 flex-1">
-                    Importez les saisies à partir d'un fichier FODEP au format Excel (.xlsx) ou CSV. Cela écrasera les données actuelles de l'arrêté pour les indicateurs présents dans le fichier. Assurez-vous que le fichier respecte le format attendu.
+                  <h2 className="text-xl font-extrabold text-[#1a2542] mb-3">Importer des données</h2>
+                  <p className="text-sm text-slate-500 mb-6 max-w-md leading-relaxed">
+                    Importez les données pour alimenter le moteur de calcul. Cela mettra à jour les données actuelles de l'arrêté.
                   </p>
                   
-                  <div className="border-2 border-dashed border-slate-200 rounded-[3px] p-12 flex flex-col items-center justify-center text-center hover:bg-slate-50 hover:border-[#3b49df] transition-all duration-300 cursor-pointer mb-6">
-                    <FileSpreadsheet className="w-10 h-10 text-slate-400 mb-4" />
-                    <span className="text-base font-semibold text-[#1a2542]">Cliquez pour sélectionner un fichier</span>
-                    <span className="text-sm text-slate-500 mt-2">ou glissez-déposez le fichier ici</span>
+                  {/* Choix du type d'import */}
+                  <div className="flex bg-slate-100 p-1.5 rounded-[4px] mb-8 w-full max-w-sm shadow-inner">
+                    <button
+                      onClick={() => setImportType('template')}
+                      className={`flex-1 py-2 px-3 rounded-[3px] text-[13px] font-bold transition-all duration-200 ${importType === 'template' ? 'bg-white text-[#3b49df] shadow-[0_1px_3px_rgba(0,0,0,0.1)]' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}
+                    >
+                      Modèle de Saisie
+                    </button>
+                    <button
+                      onClick={() => setImportType('fodep')}
+                      className={`flex-1 py-2 px-3 rounded-[3px] text-[13px] font-bold transition-all duration-200 ${importType === 'fodep' ? 'bg-white text-[#3b49df] shadow-[0_1px_3px_rgba(0,0,0,0.1)]' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}
+                    >
+                      Fichier FODEP Officiel
+                    </button>
                   </div>
                   
-                  <button className="w-full bg-[#1a2542] hover:bg-[#2a375a] text-white font-semibold py-3 px-4 rounded-[3px] text-sm shadow-[0_4px_12px_rgba(26,37,66,0.25)] hover:shadow-[0_6px_16px_rgba(26,37,66,0.35)] hover:-translate-y-px active:translate-y-0 transition-all duration-200">
+                  <div 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="border-2 border-dashed border-slate-200 rounded-[3px] p-12 flex flex-col items-center justify-center w-full hover:bg-slate-50 hover:border-[#3b49df] transition-all duration-300 cursor-pointer mb-6"
+                  >
+                    <FileSpreadsheet className="w-10 h-10 text-slate-400 mb-4" />
+                    <span className="text-[15px] font-semibold text-[#1a2542]">Cliquez pour sélectionner un fichier</span>
+                    <span className="text-[13px] text-slate-500 mt-2">ou glissez-déposez le fichier ici</span>
+                  </div>
+                  
+                  <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    className="hidden" 
+                    accept=".xlsx, .xls"
+                    onChange={handleFileChange}
+                  />
+
+                  <button 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full bg-[#1a2542] hover:bg-[#2a375a] text-white font-semibold py-3 px-4 rounded-[3px] text-sm shadow-[0_4px_12px_rgba(26,37,66,0.25)] hover:shadow-[0_6px_16px_rgba(26,37,66,0.35)] hover:-translate-y-px active:translate-y-0 transition-all duration-200 mb-4"
+                  >
                     Démarrer l'importation
                   </button>
+                  
+                  <div className="flex items-center justify-center pt-2">
+                    <div className="mt-6 text-center text-sm text-slate-500">
+                      {importType === 'template' ? (
+                        <>
+                          Vous n'avez pas de fichier structuré ?{' '}
+                          <button 
+                            onClick={() => downloadExcelTemplate()} 
+                            className="text-[#3b49df] font-bold hover:underline transition-all hover:text-blue-800 focus:outline-none"
+                          >
+                            Télécharger le modèle vierge
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          Vous n'avez pas la matrice réglementaire ?{' '}
+                          <button 
+                            onClick={() => downloadOfficialFodepTemplate()} 
+                            className="text-[#3b49df] font-bold hover:underline transition-all hover:text-blue-800 focus:outline-none"
+                          >
+                            Télécharger la matrice FODEP
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : activeTab === 'export' ? (
-              <div className="max-w-3xl mt-4 fade-in">
-                <div className="bg-white rounded-[3px] shadow-[0_4px_14px_rgba(26,37,66,0.06)] p-8 flex flex-col h-full">
-                  <div className="w-12 h-12 rounded-[3px] bg-emerald-50 flex items-center justify-center mb-6">
-                    <Download className="w-6 h-6 text-emerald-600" />
-                  </div>
-                  <h2 className="text-lg font-bold text-[#1a2542] mb-2">Exporter le rapport FODEP</h2>
-                  <p className="text-sm text-slate-500 mb-6 flex-1">
-                    Générez et téléchargez le document FODEP complet incluant toutes les sections, indicateurs réglementaires, et formules de calcul au format spécifié ci-dessous.
-                  </p>
-                  
-                  <div className="space-y-4 mb-8">
-                    <div className="flex items-center justify-between p-4 bg-white rounded-[3px] shadow-[0_1px_3px_rgba(26,37,66,0.08)] cursor-pointer hover:shadow-[0_6px_16px_rgba(26,37,66,0.14)] hover:-translate-y-0.5 transition-all duration-200">
-                      <div className="flex items-center">
-                        <FileSpreadsheet className="w-5 h-5 text-[#3b49df] mr-3" />
-                        <span className="text-sm font-semibold text-[#1a2542]">Format réglementaire (Excel .xlsx)</span>
-                      </div>
-                      <input type="radio" name="export-format" defaultChecked className="w-4 h-4 text-[#3b49df]" />
-                    </div>
-                    <div className="flex items-center justify-between p-4 bg-white rounded-[3px] shadow-[0_1px_3px_rgba(26,37,66,0.06)] cursor-pointer opacity-80 hover:opacity-100 hover:shadow-[0_6px_16px_rgba(26,37,66,0.14)] hover:-translate-y-0.5 transition-all duration-200">
-                      <div className="flex items-center">
-                        <FileSpreadsheet className="w-5 h-5 text-slate-500 mr-3" />
-                        <span className="text-sm font-semibold text-[#1a2542]">Données brutes (JSON)</span>
-                      </div>
-                      <input type="radio" name="export-format" className="w-4 h-4 text-[#3b49df]" />
-                    </div>
-                  </div>
-                  
-                  <button className="w-full mt-auto bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-[3px] text-sm shadow-[0_4px_12px_rgba(5,150,105,0.3)] hover:shadow-[0_6px_16px_rgba(5,150,105,0.4)] hover:-translate-y-px active:translate-y-0 transition-all duration-200">
-                    Télécharger l'export
-                  </button>
-                </div>
-              </div>
+              <ExportView solva={solva} />
             ) : (
               <div className="bg-white p-8 rounded-[3px] shadow-[0_4px_14px_rgba(26,37,66,0.06)] flex flex-col items-center justify-center h-64 text-center">
                 <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mb-4">
@@ -528,6 +516,53 @@ export default function App() {
           </div>
         </main>
       </div>
+
+      {importResult && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#1a2542]/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className={`p-6 border-b ${importResult.success ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100'}`}>
+              <div className="flex items-center gap-4">
+                <div className={`p-3 rounded-full ${importResult.success ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
+                  {importResult.success ? <CheckCircle2 className="w-8 h-8" /> : <AlertCircle className="w-8 h-8" />}
+                </div>
+                <div>
+                  <h3 className={`text-lg font-bold ${importResult.success ? 'text-emerald-800' : 'text-rose-800'}`}>
+                    {importResult.title}
+                  </h3>
+                  <p className="text-sm text-slate-600 mt-1 font-medium truncate max-w-[250px]">{importResult.fileName}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-sm font-semibold text-slate-500">Indicateurs détectés :</span>
+                  <span className={`text-xl font-black ${importResult.success ? 'text-emerald-600' : 'text-rose-600'}`}>
+                    {importResult.indicatorsFound}
+                  </span>
+                </div>
+                <p className="text-sm text-slate-700 leading-relaxed bg-slate-50 p-3.5 rounded-lg border border-slate-100 font-medium">
+                  {importResult.message}
+                </p>
+              </div>
+              
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setImportResult(null)}
+                  className={`px-6 py-2.5 rounded-lg text-sm font-bold text-white transition-all ${
+                    importResult.success 
+                      ? 'bg-emerald-600 hover:bg-emerald-700 shadow-[0_2px_10px_rgba(5,150,105,0.2)]' 
+                      : 'bg-[#1a2542] hover:bg-[#111827] shadow-[0_2px_10px_rgba(26,37,66,0.2)]'
+                  }`}
+                >
+                  {importResult.success ? 'Continuer' : 'Fermer et réessayer'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

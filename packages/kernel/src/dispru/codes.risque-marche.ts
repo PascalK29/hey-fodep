@@ -52,9 +52,8 @@ const EP27_CODES: DispruDef[] = [
 // ----------------------------------------------------------------------------
 const EP35_CODES: DispruDef[] = [
   input("EP35_CHANGE_POSITION_NETTE", "EP35", "Position Nette Globale de Change"),
-  computed("EP36_EXIGENCE_CHANGE", "EP36", "Exigence pour risque de change (15% ou selon norme)", ["EP35_CHANGE_POSITION_NETTE"], "Position * 0.15", (ctx) => {
-    // Arbitraire de 15% pour simplifier, à ajuster selon le réglement exact
-    return (ctx.get("EP35_CHANGE_POSITION_NETTE")?.toNumber() || 0) * 0.15;
+  computed("EP36_EXIGENCE_CHANGE", "EP36", "Exigence pour risque de change (8%)", ["EP35_CHANGE_POSITION_NETTE"], "Position * 0.08", (ctx) => {
+    return (ctx.get("EP35_CHANGE_POSITION_NETTE")?.toNumber() || 0) * 0.08;
   })
 ];
 
@@ -62,9 +61,12 @@ const EP35_CODES: DispruDef[] = [
 // EP37 & EP38: Risque sur Matières Premières
 // ----------------------------------------------------------------------------
 const EP37_CODES: DispruDef[] = [
+  input("EP37_MATPREM_POSITION_BRUTE", "EP37", "Position brute Matières Premières"),
   input("EP37_MATPREM_POSITION", "EP37", "Position nette Matières Premières"),
-  computed("EP38_EXIGENCE_MATPREM", "EP38", "Exigence pour risque matières premières (15%)", ["EP37_MATPREM_POSITION"], "Position * 0.15", (ctx) => {
-    return (ctx.get("EP37_MATPREM_POSITION")?.toNumber() || 0) * 0.15;
+  computed("EP38_EXIGENCE_MATPREM", "EP38", "Exigence pour risque matières premières (15% brut + 3% net)", ["EP37_MATPREM_POSITION_BRUTE", "EP37_MATPREM_POSITION"], "Brut * 0.15 + Net * 0.03", (ctx) => {
+    const brut = ctx.get("EP37_MATPREM_POSITION_BRUTE")?.toNumber() || 0;
+    const net = ctx.get("EP37_MATPREM_POSITION")?.toNumber() || 0;
+    return (brut * 0.15) + (net * 0.03);
   })
 ];
 

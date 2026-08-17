@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import type { SolvabiliteAnalyse } from '@heyfodep/kernel';
 import { CATEGORIES_PERTES, LIGNES_METIER_AS } from '@heyfodep/kernel';
 import { Tabs, type TabOption } from '../components/Tabs';
-import { KpiCard } from '../components/KpiCard';
 
 interface RisqueOperationnelViewProps {
   solva: SolvabiliteAnalyse;
@@ -41,84 +40,72 @@ export const RisqueOperationnelView: React.FC<RisqueOperationnelViewProps> = ({ 
   ];
 
   return (
-    <div className="space-y-6 fade-in">
-      {/* KPIs Globaux */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard 
-          title="Exigence Globale" 
-          value={formatMoney(totalExigences)} 
-          unit="M FCFA" 
-          colorScheme="slate" 
-        />
-        <KpiCard 
-          title="Total Pertes" 
-          value={formatMoney(totalPertesMontant)} 
-          unit="M FCFA" 
-          colorScheme="rose" 
-        />
-        <KpiCard 
-          title="APR Base (AIB)" 
-          value={formatMoney(aprAIB)} 
-          unit="M FCFA" 
-          colorScheme="blue" 
-        />
-        <div className="bg-[#1a2542] rounded-[3px] border border-indigo-900 shadow-sm p-3 flex flex-col justify-between text-white hover:shadow-md transition-all duration-300">
-          <div className="mb-1.5">
-            <h3 className="text-[10px] font-bold uppercase tracking-wider text-indigo-200 leading-tight">Total APR Opérationnel</h3>
-          </div>
-          <div className="flex items-baseline space-x-1 mt-auto">
-            <span className="text-base font-bold tracking-tight text-white">{formatMoney(totalAprOp)}</span>
-            <span className="text-[10px] font-semibold text-indigo-300">M FCFA</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Navigation Interne (Tabs) - Collante au défilement */}
-      <div className="sticky top-[45px] z-10 bg-[#F4F7FA]/95 backdrop-blur-sm py-2">
+    <div className="space-y-6 fade-in pb-12">
+      {/* Navigation Interne (Tabs) - Collante au défilement (100% Opaque) */}
+      <div className="sticky top-12 z-20 bg-[#F4F7FA] py-3 -mt-3 pb-3 border-b border-slate-200/40 shadow-xs">
         <Tabs tabs={tabOptions} activeTab={activeTab} onChange={setActiveTab} isSidebarCollapsed={isSidebarCollapsed} />
       </div>
 
       {/* Content wrapper */}
-      <div className="bg-white rounded-[3px] border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-[4px] border border-slate-200 shadow-sm overflow-hidden fade-in">
         
         {/* --- Indicateur de Base --- */}
         {activeTab === 'aib' && (
-          <div className="fade-in">
-            <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-              <div>
-                <h3 className="text-sm font-bold text-[#1a2542]">EP21 - Approche Indicateur de Base (AIB)</h3>
-                <p className="text-xs text-slate-500">Calcul basé sur les produits bruts des trois dernières années.</p>
+          <div>
+            <div className="flex items-center justify-between gap-4 px-5 py-3.5 bg-[#1a2542]">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-1 h-8 rounded-full" style={{ backgroundColor: '#6366f1' }} />
+                <h4 className="text-[13px] font-bold text-white leading-tight tracking-wide">EP21 - Approche Indicateur de Base (AIB)</h4>
               </div>
-              <span className="bg-indigo-50 text-indigo-700 text-xs font-bold px-2.5 py-1 rounded border border-indigo-100">
-                Exigence: {formatMoney(exigenceAIB)} M FCFA
-              </span>
+              <span className="shrink-0 text-[10px] font-bold text-indigo-200 tabular-nums">Exigence: {formatMoney(exigenceAIB)} M FCFA</span>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+            <div className="px-5 py-4 fade-in">
+              <table className="w-full">
                 <thead>
-                  <tr className="bg-white border-b-2 border-slate-100">
-                    <th className="p-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest">Élément</th>
-                    <th className="p-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest text-right">Valeur (M FCFA)</th>
+                  <tr className="text-[9.5px] font-bold uppercase tracking-wider text-blue-900 border-b border-slate-200">
+                    <th className="text-left py-2 pr-2 w-9">#</th>
+                    <th className="text-left py-2 pr-3">Libellé du poste</th>
+                    <th className="text-right py-2 pl-3">Montant (M FCFA)</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
-                  <tr className="hover:bg-slate-50 transition-colors">
-                    <td className="p-4 text-[13px] text-slate-700 font-medium">Produit brut - Année n-1</td>
-                    <td className="p-4 text-[13px] text-right text-slate-600 font-medium">{formatMoney(getVal("EP21_PB_N1"))}</td>
+                <tbody>
+                  <tr className="border-b border-slate-100 hover:bg-indigo-50/30 transition-colors">
+                    <td className="py-2.5 pr-2 text-[9px] font-black text-indigo-700 align-middle">01</td>
+                    <td className="py-2.5 pr-3 align-middle">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-[11.5px] font-semibold text-[#1a2542] leading-snug">Produit brut - Année n-1</span>
+                        <span className="font-mono text-[9px] font-bold text-indigo-400 bg-indigo-50/60 rounded-sm px-1.5 py-[2px] leading-none self-start tracking-tight">EP21_PB_N1</span>
+                      </div>
+                    </td>
+                    <td className="py-2.5 pl-3 text-right text-[11.5px] font-bold text-[#1a2542] tabular-nums align-middle">{formatMoney(getVal("EP21_PB_N1"))}</td>
                   </tr>
-                  <tr className="hover:bg-slate-50 transition-colors">
-                    <td className="p-4 text-[13px] text-slate-700 font-medium">Produit brut - Année n-2</td>
-                    <td className="p-4 text-[13px] text-right text-slate-600 font-medium">{formatMoney(getVal("EP21_PB_N2"))}</td>
+                  <tr className="border-b border-slate-100 hover:bg-indigo-50/30 transition-colors">
+                    <td className="py-2.5 pr-2 text-[9px] font-black text-indigo-700 align-middle">02</td>
+                    <td className="py-2.5 pr-3 align-middle">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-[11.5px] font-semibold text-[#1a2542] leading-snug">Produit brut - Année n-2</span>
+                        <span className="font-mono text-[9px] font-bold text-indigo-400 bg-indigo-50/60 rounded-sm px-1.5 py-[2px] leading-none self-start tracking-tight">EP21_PB_N2</span>
+                      </div>
+                    </td>
+                    <td className="py-2.5 pl-3 text-right text-[11.5px] font-bold text-[#1a2542] tabular-nums align-middle">{formatMoney(getVal("EP21_PB_N2"))}</td>
                   </tr>
-                  <tr className="hover:bg-slate-50 transition-colors">
-                    <td className="p-4 text-[13px] text-slate-700 font-medium">Produit brut - Année n-3</td>
-                    <td className="p-4 text-[13px] text-right text-slate-600 font-medium">{formatMoney(getVal("EP21_PB_N3"))}</td>
-                  </tr>
-                  <tr className="bg-indigo-50/10 font-bold">
-                    <td className="p-4 text-[13px] text-slate-900 font-bold">Moyenne des produits bruts positifs</td>
-                    <td className="p-4 text-[13px] text-right text-[#1a2542] font-black">{formatMoney(getVal("EP21_MOYENNE_PB"))}</td>
+                  <tr className="border-b border-slate-100 last:border-b-0 hover:bg-indigo-50/30 transition-colors">
+                    <td className="py-2.5 pr-2 text-[9px] font-black text-indigo-700 align-middle">03</td>
+                    <td className="py-2.5 pr-3 align-middle">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-[11.5px] font-semibold text-[#1a2542] leading-snug">Produit brut - Année n-3</span>
+                        <span className="font-mono text-[9px] font-bold text-indigo-400 bg-indigo-50/60 rounded-sm px-1.5 py-[2px] leading-none self-start tracking-tight">EP21_PB_N3</span>
+                      </div>
+                    </td>
+                    <td className="py-2.5 pl-3 text-right text-[11.5px] font-bold text-[#1a2542] tabular-nums align-middle">{formatMoney(getVal("EP21_PB_N3"))}</td>
                   </tr>
                 </tbody>
+                <tfoot>
+                  <tr className="bg-indigo-50/70 border-t border-indigo-100">
+                    <td colSpan={2} className="py-2.5 pr-2 text-[10.5px] font-black text-blue-900 uppercase tracking-wide">Moyenne des produits bruts positifs</td>
+                    <td className="py-2.5 pl-3 text-right text-sm font-black text-indigo-700 tabular-nums">{formatMoney(getVal("EP21_MOYENNE_PB"))} <span className="text-[9px] font-bold text-blue-800">M FCFA</span></td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </div>
@@ -126,38 +113,40 @@ export const RisqueOperationnelView: React.FC<RisqueOperationnelViewProps> = ({ 
 
         {/* --- Pertes Constatées --- */}
         {activeTab === 'pertes' && (
-          <div className="fade-in">
-            <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-              <div>
-                <h3 className="text-sm font-bold text-[#1a2542]">EP22 / EP24 - Pertes par Catégories d'événements</h3>
-                <p className="text-xs text-slate-500">Collecte et suivi des incidents et pertes opérationnelles.</p>
+          <div>
+            <div className="flex items-center justify-between gap-4 px-5 py-3.5 bg-[#1a2542]">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-1 h-8 rounded-full" style={{ backgroundColor: '#f43f5e' }} />
+                <h4 className="text-[13px] font-bold text-white leading-tight tracking-wide">EP22 / EP24 - Pertes par Catégories d'événements</h4>
               </div>
-              <span className="bg-rose-50 text-rose-700 text-xs font-bold px-2.5 py-1 rounded border border-rose-100">
-                Pertes Totales: {formatMoney(totalPertesMontant)} M FCFA
-              </span>
+              <span className="shrink-0 text-[10px] font-bold text-rose-200 tabular-nums">Pertes Totales: {formatMoney(totalPertesMontant)} M FCFA</span>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+            <div className="px-5 py-4 fade-in">
+              <table className="w-full">
                 <thead>
-                  <tr className="bg-white border-b-2 border-slate-100">
-                    <th className="p-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest min-w-[200px]">Catégories d'événements</th>
-                    <th className="p-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest text-right">Nombre</th>
-                    <th className="p-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest text-right">Montant total</th>
-                    <th className="p-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest text-right">Perte max</th>
-                    <th className="p-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest text-right">Somme Top 5</th>
+                  <tr className="text-[9.5px] font-bold uppercase tracking-wider text-blue-900 border-b border-slate-200">
+                    <th className="text-left py-2 pr-2 w-9">#</th>
+                    <th className="text-left py-2 pr-3">Catégories d'événements</th>
+                    <th className="text-right py-2 px-3">Nombre</th>
+                    <th className="text-right py-2 px-3">Perte max</th>
+                    <th className="text-right py-2 px-3">Somme Top 5</th>
+                    <th className="text-right py-2 pl-3">Montant total (M FCFA)</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody>
                   {CATEGORIES_PERTES.map((cat, idx) => (
-                    <tr key={`EP22_${cat.id}`} className="hover:bg-slate-50 transition-colors">
-                      <td className="p-4 text-[13px] text-slate-700 font-medium flex items-center gap-3">
-                        <span className="w-6 h-6 rounded bg-slate-100 text-slate-400 flex items-center justify-center text-[10px] font-bold">{idx + 1}</span>
-                        {cat.label}
+                    <tr key={`EP22_${cat.id}`} className="border-b border-slate-100 last:border-b-0 hover:bg-indigo-50/30 transition-colors">
+                      <td className="py-2.5 pr-2 text-[9px] font-black text-indigo-700 align-middle">{String(idx + 1).padStart(2, '0')}</td>
+                      <td className="py-2.5 pr-3 align-middle">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-[9px] font-bold text-indigo-400 bg-indigo-50/60 rounded-sm px-1.5 py-[2px] leading-none shrink-0 tracking-tight">EP22_{cat.id}</span>
+                          <span className="text-[11px] font-semibold text-blue-900 leading-snug">{cat.label}</span>
+                        </div>
                       </td>
-                      <td className="p-4 text-[13px] text-right text-slate-600 font-medium">{formatMoney(getVal(`EP22_${cat.id}_NB`))}</td>
-                      <td className="p-4 text-[13px] text-right text-slate-900 font-bold">{formatMoney(getVal(`EP22_${cat.id}_MONTANT`))}</td>
-                      <td className="p-4 text-[13px] text-right text-slate-600 font-medium">{formatMoney(getVal(`EP22_${cat.id}_MAX`))}</td>
-                      <td className="p-4 text-[13px] text-right text-slate-600 font-medium">{formatMoney(getVal(`EP22_${cat.id}_TOP5`))}</td>
+                      <td className="py-2.5 px-3 text-right text-[11.5px] font-medium text-slate-700 tabular-nums align-middle">{formatMoney(getVal(`EP22_${cat.id}_NB`))}</td>
+                      <td className="py-2.5 px-3 text-right text-[11.5px] font-medium text-slate-700 tabular-nums align-middle">{formatMoney(getVal(`EP22_${cat.id}_MAX`))}</td>
+                      <td className="py-2.5 px-3 text-right text-[11.5px] font-medium text-slate-700 tabular-nums align-middle">{formatMoney(getVal(`EP22_${cat.id}_TOP5`))}</td>
+                      <td className="py-2.5 pl-3 text-right text-[11.5px] font-bold text-[#1a2542] tabular-nums align-middle">{formatMoney(getVal(`EP22_${cat.id}_MONTANT`))}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -168,44 +157,44 @@ export const RisqueOperationnelView: React.FC<RisqueOperationnelViewProps> = ({ 
 
         {/* --- Approche Standard --- */}
         {activeTab === 'as' && (
-          <div className="fade-in">
-            <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-              <div>
-                <h3 className="text-sm font-bold text-[#1a2542]">EP23 - Approche Standard (AS)</h3>
-                <p className="text-xs text-slate-500">Exigences calculées par ligne de métier avec coefficients Beta.</p>
+          <div>
+            <div className="flex items-center justify-between gap-4 px-5 py-3.5 bg-[#1a2542]">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-1 h-8 rounded-full" style={{ backgroundColor: '#10b981' }} />
+                <h4 className="text-[13px] font-bold text-white leading-tight tracking-wide">EP23 - Approche Standard (AS)</h4>
               </div>
-              <span className="bg-emerald-50 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded border border-emerald-100">
-                Exigence AS: {formatMoney(exigenceAS)} M FCFA
-              </span>
+              <span className="shrink-0 text-[10px] font-bold text-emerald-200 tabular-nums">Exigence AS: {formatMoney(exigenceAS)} M FCFA</span>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+            <div className="px-5 py-4 fade-in overflow-x-auto">
+              <table className="w-full">
                 <thead>
-                  <tr className="bg-white border-b-2 border-slate-100">
-                    <th className="p-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest min-w-[200px]">Lignes de métier</th>
-                    <th className="p-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest text-right">PB n-1</th>
-                    <th className="p-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest text-right">PB n-2</th>
-                    <th className="p-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest text-right">PB n-3</th>
-                    <th className="p-4 text-[11px] font-bold text-slate-700 uppercase tracking-widest text-right bg-slate-50">PB Moyen</th>
-                    <th className="p-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center w-20">Bêta</th>
-                    <th className="p-4 text-[11px] font-bold text-indigo-600 uppercase tracking-widest text-right bg-indigo-50/30">Exigence</th>
+                  <tr className="text-[9.5px] font-bold uppercase tracking-wider text-blue-900 border-b border-slate-200">
+                    <th className="text-left py-2 pr-2 w-9">#</th>
+                    <th className="text-left py-2 pr-3 min-w-[200px]">Lignes de métier</th>
+                    <th className="text-right py-2 px-3">PB n-1</th>
+                    <th className="text-right py-2 px-3">PB n-2</th>
+                    <th className="text-right py-2 px-3">PB n-3</th>
+                    <th className="text-right py-2 px-3 bg-slate-50/50">PB Moyen</th>
+                    <th className="text-center py-2 px-3">Bêta</th>
+                    <th className="text-right py-2 pl-3">Exigence (M FCFA)</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody>
                   {LIGNES_METIER_AS.map((lm, idx) => (
-                    <tr key={`EP23_${lm.id}`} className="hover:bg-slate-50 transition-colors group">
-                      <td className="p-4 text-[13px] text-slate-700 font-medium flex items-center gap-3">
-                        <span className="w-6 h-6 rounded bg-slate-100 text-slate-400 flex items-center justify-center text-[10px] font-bold">{idx + 1}</span>
-                        {lm.label}
+                    <tr key={`EP23_${lm.id}`} className="border-b border-slate-100 last:border-b-0 hover:bg-indigo-50/30 transition-colors group">
+                      <td className="py-2.5 pr-2 text-[9px] font-black text-indigo-700 align-middle">{String(idx + 1).padStart(2, '0')}</td>
+                      <td className="py-2.5 pr-3 align-middle">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-[9px] font-bold text-indigo-400 bg-indigo-50/60 rounded-sm px-1.5 py-[2px] leading-none shrink-0 tracking-tight">EP23_{lm.id}</span>
+                          <span className="text-[11px] font-semibold text-blue-900 leading-snug">{lm.label}</span>
+                        </div>
                       </td>
-                      <td className="p-4 text-[13px] text-right text-slate-500 font-medium">{formatMoney(getVal(`EP23_${lm.id}_PB_N1`))}</td>
-                      <td className="p-4 text-[13px] text-right text-slate-500 font-medium">{formatMoney(getVal(`EP23_${lm.id}_PB_N2`))}</td>
-                      <td className="p-4 text-[13px] text-right text-slate-500 font-medium">{formatMoney(getVal(`EP23_${lm.id}_PB_N3`))}</td>
-                      <td className="p-4 text-[13px] text-right text-slate-800 font-black bg-slate-50/50">{formatMoney(getVal(`EP23_${lm.id}_PB_MOY`))}</td>
-                      <td className="p-4 text-[12px] text-center text-slate-500 font-bold">
-                        <span className="px-2 py-0.5 bg-slate-100 rounded text-slate-600">{lm.beta * 100}%</span>
-                      </td>
-                      <td className="p-4 text-[14px] text-right text-[#1a2542] font-black bg-indigo-50/10 group-hover:bg-indigo-50/30 transition-colors">{formatMoney(getVal(`EP23_${lm.id}_EXIGENCE`))}</td>
+                      <td className="py-2.5 px-3 text-right text-[11.5px] font-medium text-slate-600 tabular-nums align-middle">{formatMoney(getVal(`EP23_${lm.id}_PB_N1`))}</td>
+                      <td className="py-2.5 px-3 text-right text-[11.5px] font-medium text-slate-600 tabular-nums align-middle">{formatMoney(getVal(`EP23_${lm.id}_PB_N2`))}</td>
+                      <td className="py-2.5 px-3 text-right text-[11.5px] font-medium text-slate-600 tabular-nums align-middle">{formatMoney(getVal(`EP23_${lm.id}_PB_N3`))}</td>
+                      <td className="py-2.5 px-3 text-right text-[11.5px] font-bold text-slate-800 bg-slate-50/50 tabular-nums align-middle">{formatMoney(getVal(`EP23_${lm.id}_PB_MOY`))}</td>
+                      <td className="py-2.5 px-3 text-center text-[10px] font-bold text-indigo-600 align-middle">{lm.beta * 100}%</td>
+                      <td className="py-2.5 pl-3 text-right text-[11.5px] font-black text-[#1a2542] group-hover:text-indigo-700 transition-colors tabular-nums align-middle">{formatMoney(getVal(`EP23_${lm.id}_EXIGENCE`))}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -217,3 +206,6 @@ export const RisqueOperationnelView: React.FC<RisqueOperationnelViewProps> = ({ 
     </div>
   );
 };
+
+
+

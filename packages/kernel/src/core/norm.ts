@@ -30,9 +30,9 @@ export interface SolvabiliteThresholds {
 }
 
 export const DEFAULT_SOLVA_THRESHOLDS: SolvabiliteThresholds = {
-  cet1: 5,
+  cet1: 4.5,
   t1: 6,
-  total: 8,
+  total: 9,
 };
 
 /** Évalue une norme « niveau observé >= niveau requis ». */

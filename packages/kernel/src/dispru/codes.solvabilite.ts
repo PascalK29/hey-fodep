@@ -13,13 +13,20 @@ import { computed, input } from "./helpers";
 export const APR_TOTAL = "APR_TOTAL";
 
 export const solvabiliteCodes: DispruDef[] = [
-  // EP08 — dénominateur des ratios (stub tant que crédit/marché/opérationnel absents).
-  input({
+  // EP08 — dénominateur des ratios (somme des APR).
+  computed({
     code: APR_TOTAL,
     ep: "EP08",
     label: "Total des actifs pondérés des risques (APR)",
     section: "apr",
     unit: "MFCFA",
+    deps: ["RC_TOTAL_APR", "EP39_TOTAL_APR", "EP21_APR", "EP23_TOTAL_APR"],
+    formula: (ctx) => {
+      return ctx.get("RC_TOTAL_APR")
+        .plus(ctx.get("EP39_TOTAL_APR"))
+        .plus(ctx.get("EP21_APR"))
+        .plus(ctx.get("EP23_TOTAL_APR"));
+    },
   }),
 
   // EP02 — ratios de solvabilité (numérateur = fonds propres ; dénominateur = APR).

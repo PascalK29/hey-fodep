@@ -1,4 +1,5 @@
 import type { DispruDef, PostSign } from "../core/types";
+import { Decimal } from "../core/money";
 
 // ============================================================================
 // CATÉGORIES D'EXPOSITIONS (LIGNES)
@@ -85,7 +86,8 @@ CATEGORIES_EXPOSITIONS.forEach(cat => {
 // ============================================================================
 const EP11 = "EP11";
 CATEGORIES_EXPOSITIONS.forEach(cat => {
-  risqueCreditCodes.push(input(`${EP11}_${cat.id}_BRUT`, EP11, `Valeur de marché et montant notionnel - ${cat.label}`, cat.paragraphes));
+  risqueCreditCodes.push(input(`${EP11}_${cat.id}_CR`, EP11, `Coût de Remplacement - ${cat.label}`, cat.paragraphes));
+  risqueCreditCodes.push(input(`${EP11}_${cat.id}_EFP`, EP11, `Exposition Future Potentielle - ${cat.label}`, cat.paragraphes));
   risqueCreditCodes.push({
     code: `${EP11}_${cat.id}_NET`,
     ep: EP11,
@@ -94,8 +96,13 @@ CATEGORIES_EXPOSITIONS.forEach(cat => {
     unit: "MFCFA",
     kind: "computed",
     scope: "fodep",
-    deps: [`${EP11}_${cat.id}_BRUT`],
-    formula: (ctx) => ctx.get(`${EP11}_${cat.id}_BRUT`) // Simplified for now
+    deps: [`${EP11}_${cat.id}_CR`, `${EP11}_${cat.id}_EFP`],
+    formula: (ctx) => {
+      const cr = ctx.get(`${EP11}_${cat.id}_CR`).toNumber();
+      const efp = ctx.get(`${EP11}_${cat.id}_EFP`);
+      // Le CR ne peut être négatif dans la méthode de l'exposition courante
+      return new Decimal(Math.max(0, cr)).plus(efp);
+    }
   });
 });
 

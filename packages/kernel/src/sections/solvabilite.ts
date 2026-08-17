@@ -62,7 +62,7 @@ export function analyseSolvabilite(
     evalNormeMin({
       code: "SOLVA_CET1",
       libelle: "Ratio de fonds propres CET1",
-      reference: "Dispositif prudentiel — Titre III",
+      reference: "Dispositif prudentiel : Titre III",
       requis: thresholds.cet1,
       observe: ratios.cet1,
       computable,
@@ -70,7 +70,7 @@ export function analyseSolvabilite(
     evalNormeMin({
       code: "SOLVA_T1",
       libelle: "Ratio de fonds propres T1",
-      reference: "Dispositif prudentiel — Titre III",
+      reference: "Dispositif prudentiel : Titre III",
       requis: thresholds.t1,
       observe: ratios.t1,
       computable,
@@ -78,7 +78,7 @@ export function analyseSolvabilite(
     evalNormeMin({
       code: "SOLVA_TOTAL",
       libelle: "Ratio de solvabilité total",
-      reference: "Dispositif prudentiel — Titre III",
+      reference: "Dispositif prudentiel : Titre III",
       requis: thresholds.total,
       observe: ratios.total,
       computable,

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { SolvabiliteAnalyse } from '@heyfodep/kernel';
 import { CATEGORIES_EXPOSITIONS } from '@heyfodep/kernel';
+
 import { Tabs, type TabOption } from '../components/Tabs';
 
 interface RisqueCreditViewProps {
@@ -16,7 +17,7 @@ const formatMoney = (val?: number) => {
   }).format(val);
 };
 
-const BAR_COLORS = ['#1a2542', '#2a375a', '#3b49df', '#4f46e5', '#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe'];
+
 
 type TabId = 'synthese' | 'bilan' | 'hors-bilan' | 'attenuation';
 
@@ -45,23 +46,6 @@ export const RisqueCreditView: React.FC<RisqueCreditViewProps> = ({ solva, isSid
   const totalBrutGlobal = totalBilanBrut + totalHorsBilanBrut;
 
   // Calculs par catégorie pour le graphique de distribution
-  const categoryRows = CATEGORIES_EXPOSITIONS.map((cat, idx) => {
-    const netBilan = getVal(`EP09_${cat.id}_NET`);
-    const netHorsBilan = getVal(`EP10_${cat.id}_NET`);
-    const netTotal = netBilan + netHorsBilan;
-    const apr = getVal(`EP12_20_${cat.id}_APR`);
-    const brut = getVal(`EP09_${cat.id}_BRUT`) + getVal(`EP10_${cat.id}_BRUT_AVANT`);
-    const pctNet = totalExpositionNetteGlobale > 0 ? (netTotal / totalExpositionNetteGlobale) * 100 : 0;
-    return {
-      cat,
-      idx,
-      brut,
-      netTotal,
-      pctNet,
-      apr,
-      color: BAR_COLORS[idx % BAR_COLORS.length]
-    };
-  });
 
 
   const tabOptions: TabOption[] = [

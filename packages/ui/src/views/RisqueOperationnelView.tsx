@@ -25,9 +25,7 @@ export const RisqueOperationnelView: React.FC<RisqueOperationnelViewProps> = ({ 
   };
 
   const exigenceAIB = getVal("EP21_EXIGENCE");
-  const aprAIB = getVal("EP21_APR");
   const exigenceAS = getVal("EP23_TOTAL_EXIGENCE");
-  const aprAS = getVal("EP23_TOTAL_APR");
   
   const totalPertesMontant = CATEGORIES_PERTES.reduce((acc, cat) => acc + getVal(`EP22_${cat.id}_MONTANT`), 0);
 
